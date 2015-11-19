@@ -1,0 +1,47 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19-Nov-2015, 19:00:04
+    Author     : Asus
+*/
+
+@import "compass/css3";
+
+@import url(http://fonts.googleapis.com/css?family=Share+Tech+Mono);
+
+
+body{
+  background-color: #000000;
+}
+
+div{
+    align-items:center;
+}
+
+#upload{
+    background-color: #ffffff;
+}
+
+#register{
+    background-color: #ffffff;
+}
+
+#search{
+    background-color: #ffffff;
+}
+
+
+
+
+svg{
+  width: 600px;
+  height: 120px;
+  display: block;
+  position: relative;
+  overflow: hidden; 
+  margin: 0 auto;
+  background: black;
+}
