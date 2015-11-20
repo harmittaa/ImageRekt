@@ -1,7 +1,13 @@
 package imageRektServlet;
 
+import imageRektDB.Image;
+import imageRektDB.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -16,31 +22,57 @@ import javax.servlet.http.Part;
  */
 @WebServlet(name = "Upload", urlPatterns = {"/upload"})
 //@MultipartConfig(location = "/tmp")
-@MultipartConfig(location = "/home/matti/Desktop/glassfish4/glassfish/domains/domain1/applications/uploads")
+//@MultipartConfig(location = "/home/matti/Desktop/glassfish4/glassfish/domains/domain1/applications/uploads")
+@MultipartConfig(location = "/var/www/html/test/")
 public class FileUploadServlet extends HttpServlet {
+
+    //added for the transaction
+
+    EntityManagerFactory emf;
+    EntityManager em;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         try {
-            request.getPart("file").write(getFilename(request.getPart("file")));
-            out.println("File uploaded successfully!");
+            request.getPart("file").write(request.getPart("file").getSubmittedFileName());
+            out.println("File uploaded successfully! " + request.getPart("file").getSubmittedFileName());
         } catch (Exception e) {
             out.println("Exception -->" + e.getMessage());
         } finally {
-            out.close();
+            //out.close();
         }
-    }
-    
-    //from http://stackoverflow.com/questions/2422468/how-to-upload-files-to-server-using-jsp-servlet/2424824#2424824
-    private static String getFilename(Part part) {
-        for (String cd : part.getHeader("content-disposition").split(";")) {
-            if (cd.trim().startsWith("filename")) {
-                String filename = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
-                return filename.substring(filename.lastIndexOf('/') + 1).substring(filename.lastIndexOf('\\') + 1); // MSIE fix.
-            }
+                
+        /* works for creating a new user
+        emf = Persistence.createEntityManagerFactory("ImageRektPU");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        User newUser = new User(779);
+        newUser.setUname("again");
+        newUser.setUemail("21123");
+        newUser.setUpass("servlet");
+        em.persist(newUser);
+        em.getTransaction().commit(); */
+        
+        emf = Persistence.createEntityManagerFactory("ImageRektPU");
+        em = emf.createEntityManager();
+        try{
+            em.getTransaction().begin();
+            out.println("here we go<br>");
+            User u = (User)em.createNamedQuery("User.findByUid").setParameter("uid", 1).getSingleResult();
+            out.println(u.getUname() + "<br>");
+            //image title, description, Date generated in java the name of the file
+            Image img = new Image("UBER title", "desc", new Date(), request.getPart("file").getSubmittedFileName(), u);
+            out.println(img.getTitle() + "<br>");
+            em.persist(img);
+            em.getTransaction().commit(); 
+            out.println("File in DB successfully!");
+        }catch(Exception e){
+            out.println("BOOM! " + e);
         }
-        return null;
+        emf.close();
     }
+
+   
 }

@@ -118,6 +118,23 @@ and open the template in the editor.
 
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_users">Create query from DB</a></h2>
         </div>
+        
+        
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImages">
+                Search user images with PrimaryKey:
+                <input type="text" name="uid"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
+
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserByPK">
+                Search with PrimaryKey:
+                <input type="text" name="text"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
 
         <div align="center" id="register">
             <h3>Register user</h3>

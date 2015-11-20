@@ -38,6 +38,8 @@ public class GenericResource {
     private String username = "";
     private String userMail = "";
     private int userPK = 0;
+    private int userSearchTerm = 0;
+    private List<String> imagePaths;
 
 
     @Context
@@ -53,6 +55,7 @@ public class GenericResource {
      * Retrieves representation of an instance of imageRektDB.GenericResource
      * @return an instance of java.lang.String
      */
+    
     @GET
     @Path("unused")
     @Produces("application/xml")
@@ -108,6 +111,40 @@ public class GenericResource {
         return "Somethign went wrong! " + newUser.getUname() + " " + newUser.getUemail();
     }
     
+    @POST
+    @Path("findUserImages")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String findUserImages(@FormParam("uid") String uid) {
+        emf = Persistence.createEntityManagerFactory("ImageRektPU");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        this.userSearchTerm = Integer.parseInt(uid);
+        for (Image i : (List<Image>) em.createQuery("SELECT c FROM Image WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
+            this.imagePaths.add(i.getPath());
+            return i.getPath() + "<br>";
+        }
+        em.getTransaction().commit();
+        emf.close();
+        return "Nothing found :(!";
+    }
+    
+    @POST
+    @Path("findUserByPK")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String findUserByPK(@FormParam("text") String text) {
+        emf = Persistence.createEntityManagerFactory("ImageRektPU");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+        this.userSearchTerm = Integer.parseInt(text);
+        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
+            return "User found matching term " + this.userSearchTerm + " name " + p.getUname() + " email " + p.getUemail();
+        }
+        em.getTransaction().commit();
+        emf.close();
+        return "Nothing was found!";
+    } 
+    
+   
    
     // query to search for users
     @GET

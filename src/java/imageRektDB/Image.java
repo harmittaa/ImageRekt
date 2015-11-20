@@ -11,6 +11,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
@@ -44,7 +46,7 @@ public class Image implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IID")
     private Integer iid;
     @Basic(optional = false)
@@ -90,6 +92,16 @@ public class Image implements Serializable {
         this.description = description;
         this.path = path;
     }
+
+    public Image(String title, String description, Date uploadtime, String path, User uid) {
+        this.title = title;
+        this.description = description;
+        this.uploadtime = uploadtime;
+        this.path = path;
+        this.uid = uid;
+    }
+    
+    
 
     public Integer getIid() {
         return iid;

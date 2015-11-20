@@ -1,0 +1,8 @@
+20.11.
+
+Files go to /var/www/html/test/
+can be viewed from: http://192.168.56.1/test/
+
+Image upload creates a new transaction and adds the image path to the database.
+
+
