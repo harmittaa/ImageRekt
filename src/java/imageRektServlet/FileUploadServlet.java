@@ -21,12 +21,9 @@ import javax.servlet.http.Part;
  * @author patricka
  */
 @WebServlet(name = "Upload", urlPatterns = {"/upload"})
-//@MultipartConfig(location = "/tmp")
-//@MultipartConfig(location = "/home/matti/Desktop/glassfish4/glassfish/domains/domain1/applications/uploads")
+// save images here, so that they can be easily accessed from outside
 @MultipartConfig(location = "/var/www/html/test/")
 public class FileUploadServlet extends HttpServlet {
-
-    //added for the transaction
 
     EntityManagerFactory emf;
     EntityManager em;
@@ -55,6 +52,7 @@ public class FileUploadServlet extends HttpServlet {
         em.persist(newUser);
         em.getTransaction().commit(); */
         
+        //create a new transaction to add data about the image upload to DB.
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();
         try{

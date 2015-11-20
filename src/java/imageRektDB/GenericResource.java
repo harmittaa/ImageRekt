@@ -111,6 +111,8 @@ public class GenericResource {
         return "Somethign went wrong! " + newUser.getUname() + " " + newUser.getUemail();
     }
     
+    
+    //doesnt work, boo hoo
     @POST
     @Path("findUserImages")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
