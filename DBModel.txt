@@ -1,0 +1,6 @@
+User Stories
+
+https://docs.google.com/document/d/11B0fY9JcFudp04p1MIz6ydTKS0UJQ_-pnbodnUm1xtg/edit?usp=sharing
+
+DB model
+https://docs.google.com/document/d/11B0fY9JcFudp04p1MIz6ydTKS0UJQ_-pnbodnUm1xtg/edit?usp=sharing
