@@ -3,11 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/web/htmlForm.html</file>
+            <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/src/java/imageRektDB/Image.java</file>
+            <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/setup/glassfish-resources.xml</file>
             <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/web/index.html</file>
             <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/src/java/imageRektServlet/FileUploadServlet.java</file>
             <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/src/java/imageRektDB/GenericResource.java</file>
-            <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/web/newcss.css</file>
+            <file>file:/C:/Users/Asus/Documents/NetBeansProjects/ImageRekt/src/java/imageRektDB/User.java</file>
         </group>
     </open-files>
 </project-private>
