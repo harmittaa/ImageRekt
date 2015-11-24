@@ -127,11 +127,6 @@ public class GenericResource {
         for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
             queryUser = p;
         }
-
-        // doesn work
-        /*        for (Image q : (List<Image>) em.createQuery("SELECT i FROM Image i WHERE i.uid LIKE :uid").setParameter("uid", queryUser).getResultList()) {
-        return "Found image desc " + q.getDescription() + " with path " + q.getPath();
-        }*/
         imageQuery = em.createNamedQuery("Image.findAll").getResultList();
         ArrayList<Image> userImages = new ArrayList();
         for (Image i : imageQuery) {
@@ -139,7 +134,6 @@ public class GenericResource {
                 userImages.add(i);
             }
         }
-
         //works
         /*  for (Image u : (List<Image>) em.createNamedQuery("Image.findAll").getResultList()) {
          if (u.getUid() == queryUser) {

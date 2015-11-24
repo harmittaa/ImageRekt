@@ -70,7 +70,5 @@ public class FileUploadServlet extends HttpServlet {
             out.println("BOOM! " + e);
         }
         emf.close();
-    }
-
-   
+    }  
 }
