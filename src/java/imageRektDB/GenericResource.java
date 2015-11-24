@@ -147,9 +147,22 @@ public class GenericResource {
     }
 
     @POST
+    @Path("findImageByName")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String findImageByName(@FormParam("imagename") String imagename) {
+        createTransaction();
+        for (Image u : (List<Image>) em.createQuery("SELECT i FROM Image i WHERE i.title LIKE :title").setParameter("title", imagename).getResultList()) {
+            return "Found image with title " + imagename + " http://192.168.56.1/test/" + u.getPath();
+        }
+        endTransaction();
+        return "Something went wrong";
+    }
+
+    @POST
     @Path("findUserByPK")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String findUserByPK(@FormParam("text") String text) {
+    public String findUserByPK(@FormParam("text") String text
+    ) {
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -189,6 +202,18 @@ public class GenericResource {
      */
     @PUT
     @Consumes("application/xml")
-    public void putXml(String content) {
+    public void putXml(String content
+    ) {
+    }
+    
+    public void createTransaction() {
+        emf = Persistence.createEntityManagerFactory("ImageRektPU");
+        em = emf.createEntityManager();
+        em.getTransaction().begin();
+    }
+    
+    public void endTransaction() {
+        em.getTransaction().commit();
+        emf.close();
     }
 }
