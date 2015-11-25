@@ -40,18 +40,7 @@ public class FileUploadServlet extends HttpServlet {
         } finally {
             //out.close();
         }
-                
-        /* works for creating a new user
-        emf = Persistence.createEntityManagerFactory("ImageRektPU");
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-        User newUser = new User(779);
-        newUser.setUname("again");
-        newUser.setUemail("21123");
-        newUser.setUpass("servlet");
-        em.persist(newUser);
-        em.getTransaction().commit(); */
-        
+                        
         //create a new transaction to add data about the image upload to DB.
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();

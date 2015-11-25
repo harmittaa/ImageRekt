@@ -35,15 +35,11 @@ public class GenericResource {
     EntityManagerFactory emf;
     EntityManager em;
     private int i = 0;
-    private String userListStart = "Found " + i + " users from database \n";
-    private String userList = "";
-    private String newLine = "\n";
-    private String username = "";
-    private String userMail = "";
     private int userPK = 0;
     private int userSearchTerm = 0;
-    private List<String> imagePaths;
     private List<Image> imageQuery;
+    private ArrayList<String> userList;
+    private ArrayList<String> galleryImages;
     private String imagePath = "";
     private User queryUser;
 
@@ -119,10 +115,7 @@ public class GenericResource {
     @Path("findUserImages")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String findUserImages(@FormParam("uid") String uid) {
-        emf = Persistence.createEntityManagerFactory("ImageRektPU");
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-
+        createTransaction();
         this.userSearchTerm = Integer.parseInt(uid);
         for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
             queryUser = p;
@@ -134,64 +127,73 @@ public class GenericResource {
                 userImages.add(i);
             }
         }
-        //works
-        /*  for (Image u : (List<Image>) em.createNamedQuery("Image.findAll").getResultList()) {
-         if (u.getUid() == queryUser) {
-         return "Found image http://192.168.56.1/test/" + u.getPath() + " <br>";
-         }
-         } */
-        em.getTransaction().commit();
-        emf.close();
-        //return imageQuery.toString();
+        endTransaction();
         return userImages.toString();
     }
 
     @POST
     @Path("findImageByName")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("text/html")
     public String findImageByName(@FormParam("imagename") String imagename) {
         createTransaction();
         for (Image u : (List<Image>) em.createQuery("SELECT i FROM Image i WHERE i.title LIKE :title").setParameter("title", imagename).getResultList()) {
-            return "Found image with title " + imagename + " http://192.168.56.1/test/" + u.getPath();
+            return "Found image with title " + imagename + "<br>" + "<img src=\"http://192.168.56.1/test/" + u.getPath() + "\" height=\"42\" width=\"42\"><br>";
         }
         endTransaction();
-        return "Something went wrong";
+        return "Image with title couldn't be found";
     }
 
     @POST
     @Path("findUserByPK")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String findUserByPK(@FormParam("text") String text
-    ) {
-        emf = Persistence.createEntityManagerFactory("ImageRektPU");
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
+    public String findUserByPK(@FormParam("text") String text) {
+        createTransaction();
         this.userSearchTerm = Integer.parseInt(text);
         for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
             return "User found matching term " + this.userSearchTerm + " name " + p.getUname() + " email " + p.getUemail();
         }
-        em.getTransaction().commit();
-        emf.close();
+        endTransaction();
         return "Nothing was found!";
     }
 
     // query to search for users
     @GET
     @Path("get_users")
-    @Produces("text/plain")
+    @Produces("text/html")
     public String getUsers() {
         try {
-            emf = Persistence.createEntityManagerFactory("ImageRektPU");
-            em = emf.createEntityManager();
-            for (User p : (List<User>) em.createNamedQuery("User.findAll").getResultList()) {
-                return ("Total users found: " + " username found: " + p.getUname() + " with email " + p.getUemail() + "<br>" + "</br>" + "\n");
+            createTransaction();
+            List<User> userQuery = em.createNamedQuery("User.findAll").getResultList();
+            userList = new ArrayList();
+            for (User u : userQuery) {
+                userList.add("User " + u.getUname() + " with email " + u.getUemail() + " and PK " + u.getUid() + " found <br>");
             }
-            em.close();
-            emf.close();
+            endTransaction();
+            return userList.toString();
         } catch (Exception e) {
             return "Something is broken, again. : " + e;
         }
-        return "Something went wrong";
+    }
+
+    @GET
+    @Path("view_gallery")
+    @Produces("text/html")
+    public String viewGallery() {
+        createTransaction();
+        List<Image> images = em.createNamedQuery("Image.findAll").getResultList();
+        galleryImages = new ArrayList();
+        for (Image i : images) {
+            if (i.getPath().endsWith("jpg") || i.getPath().endsWith("png")) {
+                galleryImages.add("Picture title " + i.getTitle() + "<br>" + "<img src=\"http://192.168.56.1/test/" + i.getPath() + "\" height=\"200\" width=\"200\"><br>" + "Uploader " + i.getUid().getUname() + " <br>");
+            }
+            else {
+                galleryImages.add("Found upload with title " + i.getTitle() + " that is not an image <br>.");
+            }
+           // galleryImages.add("Picture title " + i.getTitle() + "<br>" + "<img src=\"http://192.168.56.1/test/" + i.getPath() + "\" height=\"200\" width=\"200\"><br>");
+        }
+        endTransaction();
+        return galleryImages.toString();
     }
 
     /**
@@ -205,13 +207,13 @@ public class GenericResource {
     public void putXml(String content
     ) {
     }
-    
+
     public void createTransaction() {
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
-    
+
     public void endTransaction() {
         em.getTransaction().commit();
         emf.close();
