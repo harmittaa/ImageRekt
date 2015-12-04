@@ -8,6 +8,12 @@ package imageRektDB;
 import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.List;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonBuilderFactory;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -34,6 +40,11 @@ public class GenericResource {
 
     EntityManagerFactory emf;
     EntityManager em;
+    JsonArray jsonImageArray;
+    JsonObject jsonImageObject;
+    JsonObjectBuilder jsonObjectBuilder;
+    JsonArray jsonImageArray2;
+    private ArrayList<JsonObject> objectArrayList;
     private int i = 0;
     private int userPK = 0;
     private int userSearchTerm = 0;
@@ -176,23 +187,28 @@ public class GenericResource {
         }
     }
 
+    // for getting a list of all the uploads stored in the DB
     @GET
     @Path("view_gallery")
     @Produces("text/html")
     public String viewGallery() {
+        // create a transaction first
         createTransaction();
+        // save the results in a list
         List<Image> images = em.createNamedQuery("Image.findAll").getResultList();
+        // create a new arraylist
         galleryImages = new ArrayList();
+        // add images into the arrayList
         for (Image i : images) {
             if (i.getPath().endsWith("jpg") || i.getPath().endsWith("png")) {
                 galleryImages.add("Picture title " + i.getTitle() + "<br>" + "<img src=\"http://192.168.56.1/test/" + i.getPath() + "\" height=\"200\" width=\"200\"><br>" + "Uploader " + i.getUid().getUname() + " <br>");
-            }
-            else {
+            } else {
                 galleryImages.add("Found upload with title " + i.getTitle() + " that is not an image <br>.");
             }
-           // galleryImages.add("Picture title " + i.getTitle() + "<br>" + "<img src=\"http://192.168.56.1/test/" + i.getPath() + "\" height=\"200\" width=\"200\"><br>");
         }
+        // end the transaction
         endTransaction();
+        // return the ArrayList with the html tags
         return galleryImages.toString();
     }
 
@@ -206,6 +222,36 @@ public class GenericResource {
     @Consumes("application/xml")
     public void putXml(String content
     ) {
+    }
+
+    @GET
+    @Path("get_json")
+    @Produces("application/json")
+    public JsonArray getJsonArray() {
+        // create a transaction first
+        createTransaction();
+        // save the results in a list
+        List<Image> images = em.createNamedQuery("Image.findAll").getResultList();
+        // create a objectBuilder
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the images and add them into the JsonObject
+        for (Image i : images) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            // build the JsonObject to finalize it
+            jsonImageObject = jsonObjectBuilder.build();
+            // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+            jsonImageArrayBuilder.add(jsonImageObject);
+        }
+        
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        endTransaction();
+        return jsonImageArray;
     }
 
     public void createTransaction() {
