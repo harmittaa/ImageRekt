@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -38,7 +40,9 @@ public class Comment implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
+    // added by matti
+    @GeneratedValue(strategy = GenerationType.IDENTITY)    
+    // @NotNull
     @Column(name = "CID")
     private Integer cid;
     @Size(max = 140)
@@ -66,6 +70,14 @@ public class Comment implements Serializable {
     public Comment(Integer cid, Date commenttime) {
         this.cid = cid;
         this.commenttime = commenttime;
+    }
+    
+    //added by matti
+    public Comment(Date commenttime, String contents, Image iid, User uid) {
+        this.commenttime = commenttime;
+        this.contents = contents;
+        this.iid = iid;
+        this.uid = uid;
     }
 
     public Integer getCid() {

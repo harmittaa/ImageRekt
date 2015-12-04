@@ -154,7 +154,6 @@ and open the template in the editor.
             </form> 
         </div>
 
-
         <div align="center" id="register">
             <h3>Check login</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin" method="post">
@@ -163,6 +162,61 @@ and open the template in the editor.
                     <br>
                     Password<br>
                     <input type="text" name="password">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+
+        <div align="center" id="register">
+            <h3>Favourite image</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/favouriteImage" method="post">
+                    Username<br>
+                    <input type="text" name="UID">
+                    <br>
+                    Image<br>
+                    <input type="text" name="IID">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+
+        <div align="center" id="register">
+            <h3>User favourites</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/getFavourites" method="post">
+                    Username<br>
+                    <input type="text" name="UID">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+        
+        <div align="center" id="register">
+            <h3>Rate image</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/rateImage" method="post">
+                    UID<br>
+                    <input type="text" name="UID">
+                    <br>
+                    IID<br>
+                    <input type="text" name="IID">
+                    <br>
+                    Rating 1-5<br>
+                    <input type="text" name="rate">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+        
+        <div align="center" id="register">
+            <h3>Comment image</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/commentImage" method="post">
+                    UID<br>
+                    <input type="text" name="UID">
+                    <br>
+                    IID<br>
+                    <input type="text" name="IID">
+                    <br>
+                    Comment<br>
+                    <input type="text" name="comment">
                     <br>
                     <input type="submit" value="Submit">    
                 </form></div>
