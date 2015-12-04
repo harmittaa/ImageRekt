@@ -5,13 +5,11 @@
  */
 package imageRektDB;
 
-import static java.lang.System.out;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.persistence.EntityManager;
@@ -19,13 +17,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
-import static javax.ws.rs.HttpMethod.POST;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -43,16 +39,20 @@ public class GenericResource {
     JsonArray jsonImageArray;
     JsonObject jsonImageObject;
     JsonObjectBuilder jsonObjectBuilder;
-    JsonArray jsonImageArray2;
-    private ArrayList<JsonObject> objectArrayList;
+    private Boolean userFound = false;
+    private User newUser;
     private int i = 0;
-    private int userPK = 0;
     private int userSearchTerm = 0;
     private List<Image> imageQuery;
-    private ArrayList<String> userList;
+    private List<Image> imageQueryJSON;
+    private List<User> userList;
+    private ArrayList<String> userArrayList;
     private ArrayList<String> galleryImages;
-    private String imagePath = "";
     private User queryUser;
+    private Image queryImage;
+    private int userRating;
+    private int searchUID;
+    private int searchIID;
 
     @Context
     private UriInfo context;
@@ -76,50 +76,85 @@ public class GenericResource {
         throw new UnsupportedOperationException();
     }
 
-    /* @POST
-     @Path("test")
-     @Consumes("multipart/form-data")
-     public String testMethod() {
-     emf = Persistence.createEntityManagerFactory("ImageRektPU");
-     em = emf.createEntityManager();
-     em.getTransaction().begin();
-     this.userPK = Integer.parseInt("15");
-     User newUser = new User(this.userPK);
-     newUser.setUname("unamefromtest");
-     newUser.setUpass("passfromtest");
-     newUser.setUemail("fromtestmethod");
-     em.persist(newUser);
-     em.getTransaction().commit();
-     return "filename";
-     }
-     */
     //for registering a new user from index.html
     @POST
     @Path("registerUser")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String registerUser(@FormParam("username") String username,
             @FormParam("email") String email,
-            @FormParam("password") String password,
-            @FormParam("pk") String pk) {
-        emf = Persistence.createEntityManagerFactory("ImageRektPU");
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-        this.userPK = Integer.parseInt(pk);
-        User newUser = new User(this.userPK);
+            @FormParam("password") String password) {
+        createTransaction();
+
+        this.userList = em.createNamedQuery("User.findAll").getResultList();
+        for (User u : this.userList) {
+            if (u.getUname().equals(username)) {
+                endTransaction();
+                return "Username already found, add another username";
+            }
+        }
+        newUser = new User();
         newUser.setUname(username);
         newUser.setUpass(password);
         newUser.setUemail(email);
         em.persist(newUser);
-        em.getTransaction().commit();
 
         // create query for finding the user just created
-        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userPK).getResultList()) {
-            return "Found just created user from database " + p.getUname() + " with email " + p.getUemail();
+        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uname LIKE :UNAME").setParameter("UNAME", username).getResultList()) {
+            return "Found just created user from database " + p.getUname() + " with email " + p.getUemail() + " UID " + p.getUid();
         }
-        em.close();
-        emf.close();
-        //if something goes wrong
-        return "Somethign went wrong! " + newUser.getUname() + " " + newUser.getUemail();
+
+        endTransaction();
+        //if the user creation failed
+        return "Somethign went wrong! User with info was not created " + newUser.getUname() + " " + newUser.getUemail();
+    }
+    
+    @POST
+    @Path("rateImage")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String rateImage (@FormParam("IID") String iid,
+                             @FormParam("rate") String rate,
+                             @FormParam("UID") String uid) {
+        // changing the search queries to integers
+        this.searchUID = Integer.parseInt(uid);
+        this.searchIID = Integer.parseInt(iid);
+        createTransaction();
+        // getting all users
+        this.userList = em.createNamedQuery("User.findAll").getResultList();
+        // finding the user
+        for (User u : this.userList) {
+            if (u.getUid() == this.searchUID) {
+                this.queryUser = u;
+            }
+        }
+        
+        this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
+        for (Image i: this.imageQuery) {
+            if (i.getIid() == this.searchIID) {
+                this.queryImage = i;
+            }
+        }
+        
+        
+        
+        return "placeholder";
+    } 
+    
+    // gets username and password and checks if matching user is found
+    @POST
+    @Path("checkUserLogin")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String checkUserLogin(@FormParam("username") String username,
+                                 @FormParam("password") String password) {
+        
+        createTransaction();
+        this.userList = em.createNamedQuery("User.findAll").getResultList();
+        for (User u : this.userList) {
+            if (u.getUname().equals(username) && u.getUpass().equals(password)) {
+                return "Logged in as user " + u.getUname() + ".";
+            }
+        }
+        
+        return "User " + username + " wasn't found in the database.";
     }
 
     @POST
@@ -131,6 +166,7 @@ public class GenericResource {
         for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
             queryUser = p;
         }
+        // save all the images into the image 
         imageQuery = em.createNamedQuery("Image.findAll").getResultList();
         ArrayList<Image> userImages = new ArrayList();
         for (Image i : imageQuery) {
@@ -140,6 +176,47 @@ public class GenericResource {
         }
         endTransaction();
         return userImages.toString();
+    }
+
+    // doesnt work
+    @POST
+    @Path("findUserImagesJSON")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    public JsonArray findUserImagesJSON(@FormParam("uid") String uid) {
+        createTransaction();
+        this.userSearchTerm = Integer.parseInt(uid);
+        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
+            queryUser = p;
+        }
+        imageQueryJSON = em.createNamedQuery("Image.findAll").getResultList();
+        imageQueryJSON = em.createQuery("SELECT i FROM Image i WHERE Image.uid LIKE :UID").setParameter("UID", 1).getResultList();
+        for (Image b : imageQueryJSON) {
+            if (b.getUid() != queryUser) {
+                imageQueryJSON.remove(b);
+            }
+        }
+        // create a objectBuilder
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the images and add them into the JsonObject
+        for (Image i : imageQueryJSON) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            // build the JsonObject to finalize it
+            jsonImageObject = jsonObjectBuilder.build();
+            // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+            jsonImageArrayBuilder.add(jsonImageObject);
+        }
+
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+
+        endTransaction();
+        return jsonImageArray;
     }
 
     @POST
@@ -176,12 +253,12 @@ public class GenericResource {
         try {
             createTransaction();
             List<User> userQuery = em.createNamedQuery("User.findAll").getResultList();
-            userList = new ArrayList();
+            userArrayList = new ArrayList();
             for (User u : userQuery) {
-                userList.add("User " + u.getUname() + " with email " + u.getUemail() + " and PK " + u.getUid() + " found <br>");
+                userArrayList.add("User " + u.getUname() + " with email " + u.getUemail() + " and PK " + u.getUid() + " found <br>");
             }
             endTransaction();
-            return userList.toString();
+            return userArrayList.toString();
         } catch (Exception e) {
             return "Something is broken, again. : " + e;
         }
@@ -247,7 +324,7 @@ public class GenericResource {
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
             jsonImageArrayBuilder.add(jsonImageObject);
         }
-        
+
         // create a JsonArray from the JsonArrayBuilder
         jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();

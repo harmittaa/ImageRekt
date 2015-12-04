@@ -129,6 +129,14 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
+        
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImagesJSON">
+                Search user images with PrimaryKey (JSON):
+                <input type="text" name="uid"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
 
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserByPK">
@@ -147,6 +155,20 @@ and open the template in the editor.
         </div>
 
 
+        <div align="center" id="register">
+            <h3>Check login</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin" method="post">
+                    Username<br>
+                    <input type="text" name="username">
+                    <br>
+                    Password<br>
+                    <input type="text" name="password">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+        
+        
         <div align="center" id="register">
             <h3>Register user</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/registerUser" method="post">
