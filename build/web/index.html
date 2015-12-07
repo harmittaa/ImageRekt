@@ -29,6 +29,8 @@ and open the template in the editor.
         <title>Sample file upload for ImageRekt</title>
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
         <link type="text/css" rel="stylesheet" href="newcss.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript"src="js.js"></script>
     </head>
     <body>
         <!-- ALL CREDIT FOR THIS MAJESTIC THING TO http://codepen.io/DirkWeber/pen/ArFvk -->
@@ -131,6 +133,22 @@ and open the template in the editor.
         </div>
         
         <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUsername">
+                Check username availability:
+                <input id="namecheck" type="text" name="username"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form method="post"<!--action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkRating"-->>
+                Check image rating
+                <input id="ratingcheck" type="text" name="username"/> <br/>
+                <input id="ratingchecksub" type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImagesJSON">
                 Search user images with PrimaryKey (JSON):
                 <input type="text" name="uid"/> <br/>
@@ -185,6 +203,16 @@ and open the template in the editor.
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/getFavourites" method="post">
                     Username<br>
                     <input type="text" name="UID">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+        
+        <div align="center" id="register">
+            <h3>Image comments</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageComments" method="post">
+                    IID<br>
+                    <input type="text" name="IID">
                     <br>
                     <input type="submit" value="Submit">    
                 </form></div>

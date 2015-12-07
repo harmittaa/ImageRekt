@@ -25,6 +25,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -42,19 +43,23 @@ public class GenericResource {
     JsonArray emptyJsonArray;
     JsonObject jsonImageObject;
     JsonObjectBuilder jsonObjectBuilder;
-    private Boolean userFound = false;
-    private User newUser;
-    private int i = 0;
     private int userSearchTerm = 0;
+    private int imageRating = 0;
+    private ArrayList<Image> userImageArray;
+    private ArrayList<String> userArrayList;
+    private ArrayList<String> galleryImages;
+    private ArrayList<Integer> imageRatings;
     private Collection<User> userCollection;
     private Collection<Image> imageCollection;
+    private Collection<Comment> commentCollection;
+    private List<Image> userImageList;
     private List<Image> imageQuery;
     private List<Image> imageQueryJSON;
     private List<Rate> rateList;
     private List<User> userList;
-    private ArrayList<String> userArrayList;
-    private ArrayList<String> galleryImages;
+    private User newUser;
     private User queryUser;
+    private Image foundImage;
     private Image queryImage;
     private Rate newRate;
     private Comment newComment;
@@ -83,6 +88,22 @@ public class GenericResource {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
+    
+    @GET
+    @Path("checkUsername/{username}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String checkUsername(@PathParam("username") String username) {
+        createTransaction();
+        this.userList = em.createNamedQuery("User.findByUname").setParameter("uname", username).getResultList();
+        if (this.userList.isEmpty()) {
+            endTransaction();
+            return "OK";
+        }
+        else {
+            endTransaction();
+            return "USED";
+        }
+    }
 
     //for registering a new user from index.html
     @POST
@@ -92,7 +113,6 @@ public class GenericResource {
             @FormParam("email") String email,
             @FormParam("password") String password) {
         createTransaction();
-
         this.userList = em.createNamedQuery("User.findAll").getResultList();
         for (User u : this.userList) {
             if (u.getUname().equals(username)) {
@@ -146,6 +166,59 @@ public class GenericResource {
         return "Comment added";
     }
 
+    //get image comments
+    @POST
+    @Path("getImageComments")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    public JsonArray getImageComments(@FormParam("IID") String IID) {
+        this.searchIID = Integer.parseInt(IID);
+        createTransaction();
+        this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
+        // setting image as null so if there is no image, it can be checked
+        // creating an empty jsonArray to return in case image is not found
+        this.queryImage = null;
+        this.emptyJsonArray = Json.createArrayBuilder().add("Image couldnt be found").build();
+        for (Image i : this.imageQuery) {
+            if (i.getIid() == this.searchIID) {
+                this.queryImage = i;
+            }
+        }
+        // if the queryImage is still set as null = the image was not found from db
+        if (this.queryImage == null) {
+            endTransaction();
+            return emptyJsonArray;
+        }
+        // create a objectBuilder
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the comments in the img and add them into the JsonObject
+        if (this.queryImage.getCommentCollection().size() >= 1) {
+            for (Comment c : this.queryImage.getCommentCollection()) {
+                jsonObjectBuilder = jsonImageObjectBuilder.add("comment", c.getContents());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("CID", c.getCid());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("UID", c.getUid().toString());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("time", c.getCommenttime().toString());
+                // build the JsonObject to finalize it
+                jsonImageObject = jsonObjectBuilder.build();
+                // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+                jsonImageArrayBuilder.add(jsonImageObject);
+            }
+        }
+        else {
+            this.emptyJsonArray = Json.createArrayBuilder().add("No comments").build(); 
+            endTransaction();
+            return this.emptyJsonArray;
+        }
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        endTransaction();
+        return jsonImageArray;
+    }
+
     // favourite images
     @POST
     @Path("favouriteImage")
@@ -183,6 +256,8 @@ public class GenericResource {
         endTransaction();
         return "Favourited image " + this.queryImage.getPath() + " for user " + this.queryUser.getUname();
     }
+    
+//    unfavorite
 
     //find users favourite images
     @POST
@@ -210,7 +285,7 @@ public class GenericResource {
         // create a objectBuilder
         JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
         // create a JsonObject
-        jsonImageObject = jsonImageObjectBuilder.build();
+        // jsonImageObject = jsonImageObjectBuilder.build();
         // create a JsonArrayBuilder
         JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
         // loop through all the images in users fav image collection and add them into the JsonObject
@@ -218,12 +293,14 @@ public class GenericResource {
             jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
             jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
             // build the JsonObject to finalize it
-            jsonImageObject = jsonObjectBuilder.build();
+            //jsonImageObject = jsonObjectBuilder.build();
+            jsonImageObject = jsonImageObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
             jsonImageArrayBuilder.add(jsonImageObject);
         }
         // create a JsonArray from the JsonArrayBuilder
-        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        //jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        jsonImageArray = jsonImageArrayBuilder.build();
         endTransaction();
         return jsonImageArray;
     }
@@ -259,6 +336,26 @@ public class GenericResource {
         endTransaction();
         return "New rating added";
     }
+    
+    // checks the rating of an image by IID
+    @GET
+    @Path("checkRating/{image}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String checkRating(@PathParam("image") String iid) {
+        createTransaction();
+        this.imageRatings = new ArrayList();
+        this.searchIID = Integer.parseInt(iid);
+        this.rateList = em.createNamedQuery("Rate.findByIid").setParameter("iid", this.searchIID).getResultList();
+        if (this.rateList.size() < 1) {
+            endTransaction();
+            return "no rating";
+        }
+        for (Rate r : this.rateList) {
+            this.imageRating += r.getRating();
+        }
+        endTransaction();
+        return "" + this.imageRating / this.rateList.size();
+    }
 
     // gets username and password and checks if matching user is found
     @POST
@@ -266,7 +363,6 @@ public class GenericResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String checkUserLogin(@FormParam("username") String username,
             @FormParam("password") String password) {
-
         createTransaction();
         this.userList = em.createNamedQuery("User.findAll").getResultList();
         for (User u : this.userList) {
@@ -274,47 +370,37 @@ public class GenericResource {
                 return "Logged in as user " + u.getUname() + ".";
             }
         }
-
         return "User " + username + " wasn't found in the database.";
     }
 
+    //find user uploaded images
     @POST
     @Path("findUserImages")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String findUserImages(@FormParam("uid") String uid) {
+    @Produces("application/json")
+    public JsonArray findUserImages(@FormParam("uid") String uid) {
+        this.userImageArray = new ArrayList();
+        this.searchUID = Integer.parseInt(uid);
         createTransaction();
-        this.userSearchTerm = Integer.parseInt(uid);
-        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
-            queryUser = p;
-        }
-        // save all the images into the image 
-        imageQuery = em.createNamedQuery("Image.findAll").getResultList();
-        ArrayList<Image> userImages = new ArrayList();
-        for (Image i : imageQuery) {
-            if (i.getUid() == queryUser) {
-                userImages.add(i);
+        this.userList = em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getResultList();
+        this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
+        // setting user as null, if there is no user, it can be checked
+        // creating an empty jsonArray to return in case user is not found
+        this.queryUser = null;
+        this.emptyJsonArray = Json.createArrayBuilder().add("User not found").build();
+        for (User u : this.userList) {
+            if (u.getUid() == this.searchUID) {
+                this.queryUser = u;
             }
         }
-        endTransaction();
-        return userImages.toString();
-    }
-
-    // doesnt work
-    @POST
-    @Path("findUserImagesJSON")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("application/json")
-    public JsonArray findUserImagesJSON(@FormParam("uid") String uid) {
-        createTransaction();
-        this.userSearchTerm = Integer.parseInt(uid);
-        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uid LIKE :UID").setParameter("UID", this.userSearchTerm).getResultList()) {
-            queryUser = p;
+        // if the queryUser is still set as null = the user was not found from db
+        if (this.queryUser == null) {
+            endTransaction();
+            return emptyJsonArray;
         }
-        imageQueryJSON = em.createNamedQuery("Image.findAll").getResultList();
-        imageQueryJSON = em.createQuery("SELECT i FROM Image i WHERE i.uid LIKE :UID").setParameter("UID", queryUser.getUid()).getResultList();
-        for (Image b : imageQueryJSON) {
-            if (b.getUid() != queryUser) {
-                imageQueryJSON.remove(b);
+        for (Image img : imageQuery) {
+            if (img.getUid() == this.queryUser) {
+                this.userImageArray.add(img);
             }
         }
         // create a objectBuilder
@@ -323,19 +409,18 @@ public class GenericResource {
         jsonImageObject = jsonImageObjectBuilder.build();
         // create a JsonArrayBuilder
         JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
-        // loop through all the images and add them into the JsonObject
-        for (Image i : imageQueryJSON) {
-            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+        // loop through all the images in users fav image collection and add them into the JsonObject
+        for (Image img : this.userImageArray) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", img.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", img.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("user", img.getUid().toString());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
             jsonImageArrayBuilder.add(jsonImageObject);
         }
-
         // create a JsonArray from the JsonArrayBuilder
-        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
-
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).add("Array " + this.userImageArray.size() + " size. " + " query user " + this.queryUser.getUid()).build();
         endTransaction();
         return jsonImageArray;
     }
@@ -440,6 +525,7 @@ public class GenericResource {
         for (Image i : images) {
             jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
             jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
