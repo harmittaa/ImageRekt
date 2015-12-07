@@ -171,7 +171,44 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
+        
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/createTag">
+                Create tag
+                <input type="text" name="tag"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkTag">
+                Check if tag exists
+                <input type="text" name="tag"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findTagID">
+                Find tag id
+                <input type="text" name="tag"/> <br/>
+                <input type="submit" value="Submit">
+            </form> 
+        </div>
 
+        <div align="center" id="register">
+            <h3>Add tag to image</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/addTagToImage" method="post">
+                    Image<br>
+                    <input type="text" name="IID">
+                    <br>
+                    Tag<br>
+                    <input type="text" name="TID">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+        
         <div align="center" id="register">
             <h3>Check login</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin" method="post">
@@ -188,6 +225,19 @@ and open the template in the editor.
         <div align="center" id="register">
             <h3>Favourite image</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/favouriteImage" method="post">
+                    Username<br>
+                    <input type="text" name="UID">
+                    <br>
+                    Image<br>
+                    <input type="text" name="IID">
+                    <br>
+                    <input type="submit" value="Submit">    
+                </form></div>
+        </div>
+
+        <div align="center" id="register">
+            <h3>Unfavourite image</h3>
+            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/unfavourite" method="post">
                     Username<br>
                     <input type="text" name="UID">
                     <br>

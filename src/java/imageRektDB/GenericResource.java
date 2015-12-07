@@ -45,6 +45,10 @@ public class GenericResource {
     JsonObjectBuilder jsonObjectBuilder;
     private int userSearchTerm = 0;
     private int imageRating = 0;
+    private int userRating;
+    private int searchUID;
+    private int searchIID;
+    private int searchTID;
     private ArrayList<Image> userImageArray;
     private ArrayList<String> userArrayList;
     private ArrayList<String> galleryImages;
@@ -52,20 +56,21 @@ public class GenericResource {
     private Collection<User> userCollection;
     private Collection<Image> imageCollection;
     private Collection<Comment> commentCollection;
+    private Collection<Tag> tagCollection;
     private List<Image> userImageList;
     private List<Image> imageQuery;
     private List<Image> imageQueryJSON;
     private List<Rate> rateList;
     private List<User> userList;
+    private List<Tag> tagList;
     private User newUser;
     private User queryUser;
     private Image foundImage;
     private Image queryImage;
     private Rate newRate;
     private Comment newComment;
-    private int userRating;
-    private int searchUID;
-    private int searchIID;
+    private Tag newTag;
+    private Tag queryTag;
 
     @Context
     private UriInfo context;
@@ -88,7 +93,7 @@ public class GenericResource {
         //TODO return proper representation object
         throw new UnsupportedOperationException();
     }
-    
+
     @GET
     @Path("checkUsername/{username}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -98,8 +103,7 @@ public class GenericResource {
         if (this.userList.isEmpty()) {
             endTransaction();
             return "OK";
-        }
-        else {
+        } else {
             endTransaction();
             return "USED";
         }
@@ -207,9 +211,8 @@ public class GenericResource {
                 // add the JsonObject to the ArrayBuilder (same as adding it to the array)
                 jsonImageArrayBuilder.add(jsonImageObject);
             }
-        }
-        else {
-            this.emptyJsonArray = Json.createArrayBuilder().add("No comments").build(); 
+        } else {
+            this.emptyJsonArray = Json.createArrayBuilder().add("No comments").build();
             endTransaction();
             return this.emptyJsonArray;
         }
@@ -256,8 +259,32 @@ public class GenericResource {
         endTransaction();
         return "Favourited image " + this.queryImage.getPath() + " for user " + this.queryUser.getUname();
     }
-    
-//    unfavorite
+
+    //unfavorite image
+    @POST
+    @Path("unfavourite")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String unfavouriteImage(@FormParam("IID") String iid,
+            @FormParam("UID") String uid) {
+        this.searchIID = Integer.parseInt(iid);
+        this.searchUID = Integer.parseInt(uid);
+        createTransaction();
+        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        this.queryUser = (User) em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getSingleResult();
+
+        // get the imageCollection from user and remove the image, then set it again
+        this.imageCollection = this.queryUser.getImageCollection();
+        this.imageCollection.remove(this.queryImage);
+        this.queryUser.setImageCollection(this.imageCollection);
+
+        // get the userCollection from the image and remove the user, then set it again
+        this.userCollection = this.queryImage.getUserCollection();
+        this.userCollection.remove(this.queryUser);
+        this.queryImage.setUserCollection(this.userCollection);
+
+        endTransaction();
+        return "Removed image " + this.queryImage.getPath() + " from user " + this.queryUser.getUname() + " favourites.";
+    }
 
     //find users favourite images
     @POST
@@ -336,7 +363,7 @@ public class GenericResource {
         endTransaction();
         return "New rating added";
     }
-    
+
     // checks the rating of an image by IID
     @GET
     @Path("checkRating/{image}")
@@ -495,6 +522,73 @@ public class GenericResource {
         return galleryImages.toString();
     }
 
+    // creates a new tag, doesn't check if the tag already appears
+    @POST
+    @Path("createTag")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String addTag(@FormParam("tag") String tagContent) {
+        createTransaction();
+        this.newTag = new Tag(tagContent);
+        em.persist(this.newTag);
+        endTransaction();
+        return "New tag created.";
+    }
+    
+    // find tag ID
+    @POST
+    @Path("findTagID")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String findTagID(@FormParam("tag") String tagContent) {
+        createTransaction();
+        this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
+        for (Tag t : this.tagList) {
+            if (t.getTcontent().equalsIgnoreCase(tagContent)) {
+                endTransaction();
+                return "" + t.getTid();
+            }
+        }
+        endTransaction();
+        return "tag not found";
+    }
+
+    @POST
+    @Path("checkTag")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String checkTag(@FormParam("tag") String tagContent) {
+        createTransaction();
+        this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
+        for (Tag t : this.tagList) {
+            if (t.getTcontent().equalsIgnoreCase(tagContent)) {
+                endTransaction();
+                return "exists";
+            }
+        }
+        endTransaction();
+        return "Tag doesn't exist";
+    }
+    
+    @POST
+    @Path("addTagToImage")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String addTagToImage(@FormParam("IID") String iid,
+                                @FormParam("TID") String tid) {
+        this.searchIID = Integer.parseInt(iid);
+        this.searchTID = Integer.parseInt(tid);
+        createTransaction();
+        this.queryImage = (Image)em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        this.queryTag = (Tag)em.createNamedQuery("Tag.findByTid").setParameter("tid", this.searchTID).getSingleResult();
+        
+        this.tagCollection = this.queryImage.getTagCollection();
+        this.tagCollection.add(this.queryTag);
+        this.queryImage.setTagCollection(this.tagCollection);
+        
+        this.imageCollection = this.queryTag.getImageCollection();
+        this.imageCollection.add(this.queryImage);
+        this.queryTag.setImageCollection(this.imageCollection);
+        endTransaction();
+        return "tag added";
+    }
+
     /**
      * PUT method for updating or creating an instance of GenericResource
      *
@@ -531,7 +625,6 @@ public class GenericResource {
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
             jsonImageArrayBuilder.add(jsonImageObject);
         }
-
         // create a JsonArray from the JsonArrayBuilder
         jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();

@@ -10,6 +10,8 @@ import java.util.Collection;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -37,7 +39,8 @@ public class Tag implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
+//    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TID")
     private Integer tid;
     @Basic(optional = false)
@@ -60,6 +63,10 @@ public class Tag implements Serializable {
 
     public Tag(Integer tid, String tcontent) {
         this.tid = tid;
+        this.tcontent = tcontent;
+    }
+    
+    public Tag(String tcontent) {
         this.tcontent = tcontent;
     }
 
