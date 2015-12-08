@@ -7,6 +7,8 @@
 $(document).ready(function () {
     var username = "";
     var imageID = 123456;
+    var tagID = 123456;
+    var tagContent = "";
 
     $("#namecheck").change(function () {
         username = $("#namecheck").val();
@@ -17,6 +19,15 @@ $(document).ready(function () {
     $("#ratingcheck").change(function () {
         imageID = $("#ratingcheck").val();
         checkRating(imageID);
+    });
+
+    $("#findImgByTag").change(function () {
+        // first find tid by tag content
+        console.log("start");
+        tagContent = $("#findImgByTag").val();
+        console.log("tagContent is " + tagContent);
+        findTID(tagContent);
+
     });
 
     function checkUsername(username) {
@@ -45,5 +56,31 @@ $(document).ready(function () {
                 alert(response);
             }
         });
+    }
+
+    function findTID(tagContent) {
+        $.ajax({
+            type: "GET",
+            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/findTagID/" + tagContent,
+            dataType: "text",
+            success: function (response) {
+                console.log("response in findTID " + response);
+                findImgByTag(response);
+            }
+        });
+    }
+    
+    function findImgByTag(tid) {
+        console.log("tag id in last " + tagID);
+        $.ajax({
+            type: "GET",
+            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByTag/" + tid,
+            dataType: "text",
+            success: function (response) {
+                alert("Last " + response);
+                $("#response").append(response);
+            }
+        });
+        
     }
 });

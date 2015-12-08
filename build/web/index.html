@@ -121,9 +121,9 @@ and open the template in the editor.
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_users">Create query from DB</a></h2>
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/view_gallery">View uploaded images</a></h2>
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_json">Get a Json Array</a></h2>
-            
+
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImages">
                 Search user images with PrimaryKey:
@@ -131,7 +131,7 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUsername">
                 Check username availability:
@@ -139,15 +139,15 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post"<!--action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkRating"-->>
-                Check image rating
-                <input id="ratingcheck" type="text" name="username"/> <br/>
+                  Check image rating
+                  <input id="ratingcheck" type="text" name="username"/> <br/>
                 <input id="ratingchecksub" type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImagesJSON">
                 Search user images with PrimaryKey (JSON):
@@ -171,7 +171,7 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/createTag">
                 Create tag
@@ -179,7 +179,7 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkTag">
                 Check if tag exists
@@ -187,12 +187,19 @@ and open the template in the editor.
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findTagID">
                 Find tag id
                 <input type="text" name="tag"/> <br/>
                 <input type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form method="post">
+                Find images by tag
+                <input id="findImgByTag" type="text" name="tag"/> <br/>
             </form> 
         </div>
 
@@ -208,7 +215,7 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
+
         <div align="center" id="register">
             <h3>Check login</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin" method="post">
@@ -257,7 +264,7 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
+
         <div align="center" id="register">
             <h3>Image comments</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageComments" method="post">
@@ -267,7 +274,7 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
+
         <div align="center" id="register">
             <h3>Rate image</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/rateImage" method="post">
@@ -283,7 +290,7 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
+
         <div align="center" id="register">
             <h3>Comment image</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/commentImage" method="post">
@@ -299,8 +306,8 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
-        
+
+
         <div align="center" id="register">
             <h3>Register user</h3>
             <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/registerUser" method="post">
@@ -318,6 +325,12 @@ and open the template in the editor.
                     <br>
                     <input type="submit" value="Submit">    
                 </form></div>
+
+            <div align="center" id="register">
+                <h3>Stuff</h3>
+                <p id="response"></p>
+            </div>
+
         </div>
     </body>
 </html>

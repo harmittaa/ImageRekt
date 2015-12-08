@@ -58,6 +58,7 @@ public class GenericResource {
     private Collection<Comment> commentCollection;
     private Collection<Tag> tagCollection;
     private List<Image> userImageList;
+    private List<Image> imageList;
     private List<Image> imageQuery;
     private List<Image> imageQueryJSON;
     private List<Rate> rateList;
@@ -523,6 +524,7 @@ public class GenericResource {
     }
 
     // creates a new tag, doesn't check if the tag already appears
+    // returns the tag id when the tag is created
     @POST
     @Path("createTag")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -530,27 +532,31 @@ public class GenericResource {
         createTransaction();
         this.newTag = new Tag(tagContent);
         em.persist(this.newTag);
+        this.queryTag = (Tag) em.createNamedQuery("Tag.findByTcontent").setParameter("tcontent", tagContent).getSingleResult();
+        this.searchTID = this.queryTag.getTid();
         endTransaction();
-        return "New tag created.";
+        return "New tag created. " + this.searchTID;
     }
-    
+
     // find tag ID
-    @POST
-    @Path("findTagID")
+    @GET
+    @Path("findTagID/{tagContent}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String findTagID(@FormParam("tag") String tagContent) {
+    public String findTagID(@PathParam("tagContent") String tagContent) {
         createTransaction();
         this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
         for (Tag t : this.tagList) {
-            if (t.getTcontent().equalsIgnoreCase(tagContent)) {
+            if (t.getTcontent().equalsIgnoreCase("#" + tagContent)) {
                 endTransaction();
                 return "" + t.getTid();
             }
         }
         endTransaction();
-        return "tag not found";
+        return "no_tag";
     }
 
+    // check if the tag exists or not
+    // if it exists returns the tag id
     @POST
     @Path("checkTag")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -559,34 +565,73 @@ public class GenericResource {
         this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
         for (Tag t : this.tagList) {
             if (t.getTcontent().equalsIgnoreCase(tagContent)) {
+                this.searchTID = t.getTid();
                 endTransaction();
-                return "exists";
+                return "" + this.searchTID;
             }
         }
         endTransaction();
         return "Tag doesn't exist";
     }
-    
+
+    // add tag to image
     @POST
     @Path("addTagToImage")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addTagToImage(@FormParam("IID") String iid,
-                                @FormParam("TID") String tid) {
+            @FormParam("TID") String tid) {
         this.searchIID = Integer.parseInt(iid);
         this.searchTID = Integer.parseInt(tid);
         createTransaction();
-        this.queryImage = (Image)em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
-        this.queryTag = (Tag)em.createNamedQuery("Tag.findByTid").setParameter("tid", this.searchTID).getSingleResult();
-        
+        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        this.queryTag = (Tag) em.createNamedQuery("Tag.findByTid").setParameter("tid", this.searchTID).getSingleResult();
+
         this.tagCollection = this.queryImage.getTagCollection();
         this.tagCollection.add(this.queryTag);
         this.queryImage.setTagCollection(this.tagCollection);
-        
+
         this.imageCollection = this.queryTag.getImageCollection();
         this.imageCollection.add(this.queryImage);
         this.queryTag.setImageCollection(this.imageCollection);
         endTransaction();
         return "tag added";
+    }
+
+    // find images by tag, use tag id to searc
+    // returns JSON array of images, or if no imgs have the tag
+    // then returns "no imgs"
+    @GET
+    @Path("findImageByTag/{tag}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public JsonArray findImageByTag(@PathParam("tag") String tid) {
+        this.searchTID = Integer.parseInt(tid);
+        createTransaction();
+        this.queryTag = (Tag) em.createNamedQuery("Tag.findByTid").setParameter("tid", this.searchTID).getSingleResult();
+
+        this.imageCollection = this.queryTag.getImageCollection();
+        if (!this.imageCollection.isEmpty()) {
+            JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+            // create a JsonArrayBuilder
+            JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+            // loop through all the images in users fav image collection and add them into the JsonObject
+            for (Image i : this.imageCollection) {
+                jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+                // build the JsonObject to finalize it
+                jsonImageObject = jsonImageObjectBuilder.build();
+                // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+                jsonImageArrayBuilder.add(jsonImageObject);
+            }
+            // create a JsonArray from the JsonArrayBuilder
+            this.jsonImageArray = jsonImageArrayBuilder.build();
+        } else {
+            this.emptyJsonArray = Json.createArrayBuilder().add("no imgs").build();
+            endTransaction();
+            return this.emptyJsonArray;
+        }
+        endTransaction();
+        return this.jsonImageArray;
     }
 
     /**
