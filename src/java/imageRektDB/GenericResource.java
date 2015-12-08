@@ -95,6 +95,7 @@ public class GenericResource {
         throw new UnsupportedOperationException();
     }
 
+    //js in place
     @GET
     @Path("checkUsername/{username}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -171,12 +172,13 @@ public class GenericResource {
         return "Comment added";
     }
 
+    //js in place
     //get image comments
-    @POST
-    @Path("getImageComments")
+    @GET
+    @Path("getImageComments/{image}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json")
-    public JsonArray getImageComments(@FormParam("IID") String IID) {
+    public JsonArray getImageComments(@PathParam("image") String IID) {
         this.searchIID = Integer.parseInt(IID);
         createTransaction();
         this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
@@ -224,11 +226,12 @@ public class GenericResource {
     }
 
     // favourite images
-    @POST
-    @Path("favouriteImage")
+    // js in place
+    @GET
+    @Path("favouriteImage/{image}/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String favouriteImage(@FormParam("IID") String iid,
-            @FormParam("UID") String uid) {
+    public String favouriteImage(@PathParam("image") String iid,
+            @PathParam("user") String uid) {
         this.searchIID = Integer.parseInt(iid);
         this.searchUID = Integer.parseInt(uid);
         createTransaction();
@@ -262,11 +265,11 @@ public class GenericResource {
     }
 
     //unfavorite image
-    @POST
-    @Path("unfavourite")
+    @GET
+    @Path("unfavouriteImage/{image}/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String unfavouriteImage(@FormParam("IID") String iid,
-            @FormParam("UID") String uid) {
+    public String unfavouriteImage(@PathParam("image") String iid,
+            @PathParam("user") String uid) {
         this.searchIID = Integer.parseInt(iid);
         this.searchUID = Integer.parseInt(uid);
         createTransaction();
@@ -453,17 +456,33 @@ public class GenericResource {
         return jsonImageArray;
     }
 
-    @POST
-    @Path("findImageByName")
+    // find image(s) by title
+    @GET
+    @Path("findImageByTitle/{title}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("text/html")
-    public String findImageByName(@FormParam("imagename") String imagename) {
+    public JsonArray findImageByName(@PathParam("title") String title) {
         createTransaction();
-        for (Image u : (List<Image>) em.createQuery("SELECT i FROM Image i WHERE i.title LIKE :title").setParameter("title", imagename).getResultList()) {
-            return "Found image with title " + imagename + "<br>" + "<img src=\"http://192.168.56.1/test/" + u.getPath() + "\" height=\"42\" width=\"42\"><br>";
+        this.imageQuery = em.createNamedQuery("Image.findByTitle").setParameter("title", title).getResultList();
+        if (!this.imageQuery.isEmpty()) {
+            JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+            // create a JsonArrayBuilder
+            JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+            // loop through all the images in users fav image collection and add them into the JsonObject
+            for (Image i : this.imageQuery) {
+                jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+                // build the JsonObject to finalize it
+                jsonImageObject = jsonImageObjectBuilder.build();
+                // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+                jsonImageArrayBuilder.add(jsonImageObject);
+            }
+            // create a JsonArray from the JsonArrayBuilder
+            this.jsonImageArray = jsonImageArrayBuilder.build();
+        } else {
+            this.emptyJsonArray = Json.createArrayBuilder().add("No images wit title").build();
         }
-        endTransaction();
-        return "Image with title couldn't be found";
+        return jsonImageArray;
     }
 
     @POST
