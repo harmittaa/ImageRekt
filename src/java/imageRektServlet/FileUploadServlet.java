@@ -47,10 +47,11 @@ public class FileUploadServlet extends HttpServlet {
         try{
             em.getTransaction().begin();
             out.println("here we go<br>");
-            User u = (User)em.createNamedQuery("User.findByUid").setParameter("uid", 1).getSingleResult();
+            int fileuploader = Integer.parseInt(request.getParameter("fileuploader"));
+            User u = (User)em.createNamedQuery("User.findByUid").setParameter("uid", fileuploader).getSingleResult();
             out.println(u.getUname() + "<br>");
             //image title, description, Date generated in java the name of the file
-            Image img = new Image("Title", "desc", new Date(), request.getPart("file").getSubmittedFileName(), u);
+            Image img = new Image(request.getParameter("filetitle"), request.getParameter("filedesc"), new Date(), request.getPart("file").getSubmittedFileName(), u);
             out.println(img.getTitle() + "<br>");
             em.persist(img);
             em.getTransaction().commit(); 

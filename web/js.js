@@ -11,6 +11,15 @@ $(document).ready(function () {
     var tagContent = "";
     var imageTitle = "";
 
+    $("#get_json_gallery").change(function () {
+        alert("test");
+        getJsonGallery();
+    });
+
+    $("#findRandomImage").change(function () {
+        findRandomImage();
+    });
+
     $("#namecheck").change(function () {
         username = $("#namecheck").val();
         checkUsername(username);
@@ -55,6 +64,26 @@ $(document).ready(function () {
         unfavouriteImage(imageID, username);
     });
 
+    function getJsonGallery() {
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/get_json_gallery", function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    //  console.log("Nr2 index" + index + " value " + value);
+                    $.each(value, function (index, value) {
+                        console.log("nr3 inxed " + index + " value " + value);
+                        if (index.localeCompare("title")) {
+                            $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'>");
+                        }
+                        else if (index.localeCompare("path")) {
+                            $("#responseDIV").append("<p>" + value + "</p><br>");
+                        }
+                    });
+                });
+            });
+        });
+    }
+
     function checkUsername(username) {
         $.ajax({
             type: "GET",
@@ -95,42 +124,78 @@ $(document).ready(function () {
         });
     }
 
-    function findImgByTag(tid) {
-        console.log("tag id in last " + tagID);
-        $.ajax({
-            type: "GET",
-            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByTag/" + tid,
-            dataType: "text",
-            success: function (response) {
-                alert("Last " + response);
-                $("#response").append(response);
-            }
+    function findImgByTag(response) {
+        console.log("tag id in last " + response);
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByTag/" + response, function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr2 index " + index + " value " + value);
+                    if (index === "title") {
+                        console.log("this is the compare for image " + index.localeCompare("title"));
+                        console.log("image found " + index);
+                        $("#responseDIV").append("<p>" + value + "</p><br>");
+                    }
+                    else if (index === "path") {
+                        console.log("Title found " + index);
+                        $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'><br>");
+                    }
+                    else if (index === "iid") {
+                        console.log("IID found " + index);
+                    }
+                });
+            });
         });
     }
 
     function findImageByTitle(title) {
         console.log("Finding image by the title (in function) " + title);
-        $.ajax({
-            type: "GET",
-            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByTitle/" + title,
-            dataType: "text",
-            success: function (response) {
-                alert("Last " + response);
-                $("#response").append(response);
-            }
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByTitle/" + title, function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr2 index " + index + " value " + value);
+                    if (index === "title") {
+                        console.log("this is the compare for image " + index.localeCompare("title"));
+                        console.log("image found " + index);
+                        $("#responseDIV").append("<p>" + value + "</p><br>");
+                    }
+                    else if (index === "path") {
+                        console.log("Title found " + index);
+                        $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'><br>");
+                    }
+                    else if (index === "iid") {
+                        console.log("IID found " + index);
+                    }
+                });
+            });
         });
     }
 
     function getImageComments(imageID) {
         console.log("Finding image comments(in function) " + imageID);
-        $.ajax({
-            type: "GET",
-            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageComments/" + imageID,
-            dataType: "text",
-            success: function (response) {
-                alert("Last " + response);
-                $("#response").append(response);
-            }
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageComments/" + imageID, function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr2 index " + index + " value " + value);
+                    $.each(value, function (index, value) {
+                        console.log("Nr index " + index + " value " + value);
+                        if (index === "comment") {
+                            console.log("comment found " + value);
+                            $("#responseDIV").append("<p>" + value + "</p><br>");
+                        }
+                        else if (index === "user") {
+                            console.log("User found " + index);
+                            $("#responseDIV").append("<p>" + value + "</p><br>");
+                        }
+                        else if (index === "time") {
+                            console.log("Time found " + index);
+                            $("#responseDIV").append("<p>" + value + "</p><br>");
+                        }
+                    });
+                });
+            });
         });
     }
 
@@ -160,4 +225,26 @@ $(document).ready(function () {
         });
     }
 
+    function findRandomImage() {
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findRandomImage", function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr2 index " + index + " value " + value);
+                    if (index === "title") {
+                        console.log("this is the compare for image " + index.localeCompare("title"));
+                        console.log("image found " + index);
+                        $("#responseDIV").append("<p>" + value + "</p><br>");
+                    }
+                    else if (index === "path") {
+                        console.log("Title found " + index);
+                        $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'><br>");
+                    }
+                    else if (index === "iid") {
+                        console.log("IID found " + index);
+                    }
+                });
+            });
+        });
+    }
 });

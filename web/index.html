@@ -112,29 +112,44 @@ and open the template in the editor.
             <form method="POST" action="upload" enctype="multipart/form-data">
                 File:
                 <input type="file" name="file" id="file" /> <br/>
-                Destination:            
-                <input type="text" value="/tmp" name="destination"/>
                 <br/>
+                Description:
+                <input type="text" name="filedesc" id="file" /> <br/>
+                <br/>
+                Title:
+                <input type="text" name="filetitle"> <br>
+                UID:
+                <input type="text" name="fileuploader"><br>
                 <input type="submit" value="Upload" name="TEST;)" id="upload"/>
             </form> 
 
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_users">Create query from DB</a></h2>
             <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/view_gallery">View uploaded images</a></h2>
-            <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_json">Get a Json Array</a></h2>
+            <h2><a href="http://192.168.56.1:8080/ImageRekt/webresources/generic/get_json_gallery">Get a Json Array</a></h2>
 
         </div>
 
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImages">
                 Search user images with PrimaryKey:
+                <br>
                 <input type="text" name="uid"/> <br/>
                 <input type="submit" value="Submit">
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form>
+                Generate gallery
+                <br>
+                <input id="get_json_gallery" type="text" name="uid"/> <br/>
             </form> 
         </div>
 
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUsername">
                 Check username availability:
+                <br>
                 <input id="namecheck" type="text" name="username"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
@@ -143,6 +158,7 @@ and open the template in the editor.
         <div align="center" id="register">
             <form method="post"<!--action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkRating"-->>
                   Check image rating
+                  <br>
                   <input id="ratingcheck" type="text" name="username"/> <br/>
                 <input id="ratingchecksub" type="submit" value="Submit">
             </form> 
@@ -151,6 +167,7 @@ and open the template in the editor.
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImagesJSON">
                 Search user images with PrimaryKey (JSON):
+                <br>
                 <input type="text" name="uid"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
@@ -159,6 +176,7 @@ and open the template in the editor.
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserByPK">
                 Search with PrimaryKey:
+                <br>
                 <input type="text" name="text"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
@@ -166,14 +184,24 @@ and open the template in the editor.
 
         <div align="center" id="register">
             <form method="post">
-                Search with image name
+                Search with image title
+                <br>
                 <input id="searchImageTitle" type="text" name="imagename"/> <br/>
+            </form> 
+        </div>
+        
+        <div align="center" id="register">
+            <form method="post">
+                Find random image
+                <br>
+                <input id="findRandomImage" type="text" name="imagename"/> <br/>
             </form> 
         </div>
 
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/createTag">
                 Create tag
+                <br>
                 <input type="text" name="tag"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
@@ -182,6 +210,7 @@ and open the template in the editor.
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/checkTag">
                 Check if tag exists
+                <br>
                 <input type="text" name="tag"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
@@ -190,14 +219,16 @@ and open the template in the editor.
         <div align="center" id="register">
             <form method="post" action="http://192.168.56.1:8080/ImageRekt/webresources/generic/findTagID">
                 Find tag id
+                <br>
                 <input type="text" name="tag"/> <br/>
                 <input type="submit" value="Submit">
             </form> 
         </div>
-        
+
         <div align="center" id="register">
             <form method="post">
                 Find images by tag
+                <br>
                 <input id="findImgByTag" type="text" name="tag"/> <br/>
             </form> 
         </div>
@@ -240,7 +271,7 @@ and open the template in the editor.
                     <input type="submit" value="Submit">    
                 </form></div>
         </div>
-        
+
         <div align="center" id="register">
             <h3>Favourite image DOESNT WORK</h3>
             <div><form>
@@ -351,7 +382,7 @@ and open the template in the editor.
                 </form></div>
 
             <div align="center" id="register">
-                <h3>Stuff</h3>
+                <h3 id="responseDIV">Stuff</h3>
                 <p id="response"></p>
             </div>
 
