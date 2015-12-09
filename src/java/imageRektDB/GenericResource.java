@@ -98,7 +98,6 @@ public class GenericResource {
 //        //TODO return proper representation object
 //        throw new UnsupportedOperationException();
 //    }
-
     //js in place
     @GET
     @Path("checkUsername/{username}")
@@ -113,6 +112,33 @@ public class GenericResource {
             endTransaction();
             return "USED";
         }
+    }
+
+    // get image by iid
+    @GET
+    @Path("getImageByIID/{image}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public JsonArray getImageByIID(@PathParam("image") String iid) {
+        this.searchIID = Integer.parseInt(iid);
+        createTransaction();
+        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        // create a objectBuilder
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the images and add them into the JsonObject
+        jsonObjectBuilder = jsonImageObjectBuilder.add("path", this.queryImage.getPath());
+        jsonObjectBuilder = jsonImageObjectBuilder.add("title", this.queryImage.getTitle());
+        // build the JsonObject to finalize it
+        jsonImageObject = jsonObjectBuilder.build();
+        // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+        jsonImageArrayBuilder.add(jsonImageObject);
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        endTransaction();
+        return jsonImageArray;
     }
 
     //for registering a new user from index.html
@@ -718,7 +744,7 @@ public class GenericResource {
         for (Image i : images) {
             jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
             jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
-            //jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)

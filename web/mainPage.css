@@ -1,0 +1,15 @@
+body{
+	background-color: #e0e0e0;
+}
+
+#commentdiv{
+	background-color: #fafafa;
+}
+
+#uploadbutton{
+	margin-top: 7px;
+}
+
+#submitcomment{
+	margin-top: 5px;
+}
