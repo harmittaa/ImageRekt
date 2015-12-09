@@ -91,13 +91,13 @@ public class GenericResource {
      *
      * @return an instance of java.lang.String
      */
-    @GET
-    @Path("unused")
-    @Produces("application/xml")
-    public String getXml() {
-        //TODO return proper representation object
-        throw new UnsupportedOperationException();
-    }
+//    @GET
+//    @Path("unused")
+//    @Produces("application/xml")
+//    public String getXml() {
+//        //TODO return proper representation object
+//        throw new UnsupportedOperationException();
+//    }
 
     //js in place
     @GET
@@ -268,6 +268,7 @@ public class GenericResource {
     }
 
     //unfavorite image
+    // js in place
     @GET
     @Path("unfavouriteImage/{image}/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -294,11 +295,12 @@ public class GenericResource {
     }
 
     //find users favourite images
-    @POST
-    @Path("getFavourites")
+    // js in place
+    @GET
+    @Path("getFavourites/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json")
-    public JsonArray getFavourites(@FormParam("UID") String uid) {
+    public JsonArray getFavourites(@PathParam("user") String uid) {
         this.searchUID = Integer.parseInt(uid);
         createTransaction();
         this.userList = em.createNamedQuery("User.findAll").getResultList();
@@ -340,12 +342,12 @@ public class GenericResource {
     }
 
     //create or update image rating
-    @POST
-    @Path("rateImage")
+    @GET
+    @Path("rateImage/{user}/{image}/{rate}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String rateImage(@FormParam("IID") String iid,
-            @FormParam("rate") String rate,
-            @FormParam("UID") String uid) {
+    public String rateImage(@PathParam("image") String iid,
+            @PathParam("rate") String rate,
+            @PathParam("user") String uid) {
         // changing the search queries to integers
         this.searchUID = Integer.parseInt(uid);
         this.searchIID = Integer.parseInt(iid);
@@ -360,7 +362,7 @@ public class GenericResource {
             if (r.getImage().getIid() == this.searchIID && r.getUser().getUid() == this.searchUID) {
                 r.setRating(this.userRating);
                 endTransaction();
-                return "Rating changed.";
+                return "CHANGED";
             }
         }
         //create new rating if necessary
@@ -368,7 +370,7 @@ public class GenericResource {
         newRate.setRating(userRating);
         em.persist(newRate);
         endTransaction();
-        return "New rating added";
+        return "NEW";
     }
 
     // checks the rating of an image by IID
@@ -650,6 +652,7 @@ public class GenericResource {
     // find images by tag, use tag id to searc
     // returns JSON array of images, or if no imgs have the tag
     // then returns "no imgs"
+    // js in place
     @GET
     @Path("findImageByTag/{tag}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

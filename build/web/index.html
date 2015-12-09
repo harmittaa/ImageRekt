@@ -312,11 +312,10 @@ and open the template in the editor.
 
         <div align="center" id="register">
             <h3>User favourites</h3>
-            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/getFavourites" method="post">
+            <div><form>
                     Username<br>
-                    <input type="text" name="UID">
+                    <input id="getFavourites" type="text" name="UID">
                     <br>
-                    <input type="submit" value="Submit">    
                 </form></div>
         </div>
 
@@ -332,17 +331,19 @@ and open the template in the editor.
 
         <div align="center" id="register">
             <h3>Rate image</h3>
-            <div><form action="http://192.168.56.1:8080/ImageRekt/webresources/generic/rateImage" method="post">
+            <div><form>
                     UID<br>
-                    <input type="text" name="UID">
+                    <input id="rateImageUID" type="text" name="UID">
                     <br>
                     IID<br>
-                    <input type="text" name="IID">
+                    <input id="rateImageIID" type="text" name="IID">
                     <br>
                     Rating 1-5<br>
-                    <input type="text" name="rate">
+                    <input id="rateImageRate" type="text" name="rate">
                     <br>
-                    <input type="submit" value="Submit">    
+                    Change this to trigger
+                    <input id="rateImage" type="text">
+                    <br>
                 </form></div>
         </div>
 

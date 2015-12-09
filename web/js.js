@@ -6,6 +6,8 @@
 
 $(document).ready(function () {
     var username = "";
+    var userID;
+    var rating;
     var imageID = 123456;
     var tagID = 123456;
     var tagContent = "";
@@ -14,6 +16,12 @@ $(document).ready(function () {
     $("#get_json_gallery").change(function () {
         alert("test");
         getJsonGallery();
+    });
+
+    $("#getFavourites").change(function () {
+        console.log("get favourites started");
+        userID = $("#getFavourites").val();
+        getFavourites(userID);
     });
 
     $("#findRandomImage").change(function () {
@@ -28,6 +36,14 @@ $(document).ready(function () {
     $("#ratingcheck").change(function () {
         imageID = $("#ratingcheck").val();
         checkRating(imageID);
+    });
+
+    $("#rateImage").change(function () {
+        userID = $("#rateImageUID").val();
+        imageID = $("#rateImageIID").val();
+        rating = $("#rateImageRate").val();
+        console.log("UID " + userID + " imageId " + imageID + " rating " + rating);
+        rateImage(userID, imageID, rating);
     });
 
     $("#findImgByTag").change(function () {
@@ -82,6 +98,49 @@ $(document).ready(function () {
                 });
             });
         });
+    }
+
+    function rateImage(user, image, rate) {
+        $.ajax({
+            type: "GET",
+            url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/rateImage/"+ user + "/" + image + "/" + rate,
+            dataType: "text",
+            success: function (response) {
+                //alert("response " + response);
+                if (response === ("NEW")) {
+                     $("#responseDIV").append("<p>" + response + "</p><br>");
+                }
+                else if (response === ("USED")) {
+                    $("#responseDIV").append("<p>" + response + "</p><br>");
+                }
+            }
+        });
+
+    }
+
+    function getFavourites(user) {
+        console.log("Finding user favourites " + user);
+        $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/getFavourites/" + user, function (data) {
+            $.each(data, function (index, value) {
+                console.log("index " + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr2 index " + index + " value " + value);
+                    if (index === "title") {
+                        console.log("this is the compare for image " + index.localeCompare("title"));
+                        console.log("image found " + index);
+                        $("#responseDIV").append("<p>" + value + "</p><br>");
+                    }
+                    else if (index === "path") {
+                        console.log("Title found " + index);
+                        $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'><br>");
+                    }
+                    else if (index === "iid") {
+                        console.log("IID found " + index);
+                    }
+                });
+            });
+        });
+
     }
 
     function checkUsername(username) {
