@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ImageRekt | Home</title>
+        <link href="bootstrap.min.css" rel="stylesheet">
+        <script src="jquery-1.11.3.min.js"></script>
+        <script src="bootstrap.min.js"></script>
+        <script src="http://malsup.github.com/jquery.form.js"></script> 
+        <script src="homePage.js"></script>
+        <link rel="stylesheet" type="text/css" href="mainPage.css">
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+
+                    <button id="uploadbutton" type="button" class="btn btn-success" >Upload</button>
+
+                    <a class="navbar-brand" href="#" id="logo">ImageRekt</a>
+
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNav">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+
+                <div class="collapse navbar-collapse" id="myNav">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#" id="home">Home</a></li>
+                        <li><a href="#" id="search">Search</a></li>
+                        <li><a href="#" id="myprofile">My Profile</a></li>
+                        <li><a href="#" id="signup">Signup</a></li>
+                        <!--<li><a href="#"></a></li>-->
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right" id="login">
+                        <li><a href="#"><span></span> Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row" id="rowId">
+                <div class="col-md-3 col-sm-6" id="picturediv">
+                    <!--PICTURES FROM JS-->
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 col-xs-12"><p>Unless otherwise stated, this website and all content within this site are the property of ImageRekt and are protected by copyright and other intellectual property laws.</p></div>
+            </div>
+        </div>
+
+        <!--MODAL STUFf-->
+
+        <!--UPLOAD IMAGE-->
+        <div class="modal fade" id="uploadUpMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Upload an image give it title and description</h4>
+                    </div>
+                    <div class="modal-body">
+                    <form id="uploadform" method="POST" action="upload" enctype="multipart/form-data">
+<!--                        <form id="form1">-->
+                            <img id="blah" src="#" width="150" height="150">
+                            <input id="imgInp" type="file" name="file" class="file">
+                            <button id="removebutton" type="button" class="btn btn-danger btn-sm">Remove</button>
+                        <!--</form>-->
+                        <br>
+
+                        <textarea class="form-control" rows="1" id="titleinput" name="titleinput" placeholder="Title"></textarea>
+                        <br>
+                        <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description"></textarea>
+                        <br>
+                        <input type="submit" value="Upload" name="TEST;)" id="upload"/>
+                    </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="uploadcheck" type="button" class="btn btn-success">Upload!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--SIGN UP-->
+        <div class="modal fade" id="signUpMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Type your username, password and email</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" id="username" placeholder="Username" />
+                        <br>
+                        <input type="password" id="password" placeholder="Password" />
+                        <br>
+                        <input type="password" id="passwordconf" placeholder="Cornfirm Password" />
+                        <br>
+                        <input type="text" id="email" placeholder="Email"/>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="alreadyuser" type="button" class="btn btn-primary" data-dismiss="modal">Already a user? Login here!</button>
+                        <button id="signupcheck" type="button" class="btn btn-default">Sign up!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--LOGIN-->
+        <div class="modal fade" id="logInMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Type your username and password</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="usernameLogIn" placeholder="Username" />
+                        <br>
+                        <input type="password" id="passwordLogIn" placeholder="Password"/>
+                        <br>
+                        <button id="forgotpass" type="button" class="btn btn-forgot" data-dismiss="modal">Forgot password?</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="notuser" type="button" class="btn btn-primary" data-dismiss="modal">Not user? Sign up, here!</button>
+                        <button id="logincheck" type="button" class="btn btn-default">Login</button>	
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--SEARCH-->
+        <div class="modal fade" id="searchMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Search images based on their titles or on their tags by adding #</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search" id="searchbox">
+                            </div>
+                            <button type="submit" class="btn btn-default" id="submitsearch" >Submit</button>
+                        </form>
+                    </div> <!--modal-body-->
+                </div> <!--modal-content-->
+            </div> <!--modal-dialog-->
+        </div><!--modal-fade-->
+
+        <!--FORGOT PASSWORD?!-->
+        <div class="modal fade" id="forgotMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Type your username and email to retrieve your password</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="username" placeholder="Username" />
+                        <br>
+                        <input type="password" id="email" placeholder="Email"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="forgotcheck" type="button" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </body>
+</html>

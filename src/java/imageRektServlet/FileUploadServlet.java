@@ -14,13 +14,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 /**
  *
  * @author patricka
  */
-@WebServlet(name = "Upload", urlPatterns = {"/upload"})
+@WebServlet(name = "upload", urlPatterns = {"/upload"})
 // save images here, so that they can be easily accessed from outside
 @MultipartConfig(location = "/var/www/html/test/")
 public class FileUploadServlet extends HttpServlet {
@@ -38,27 +37,29 @@ public class FileUploadServlet extends HttpServlet {
         } catch (Exception e) {
             out.println("Exception -->" + e.getMessage());
         } finally {
-            //out.close();
         }
-                        
+
         //create a new transaction to add data about the image upload to DB.
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();
-        try{
+        out.println("Still works<br>");
+        out.println("Transaction created<br>");
+        try {
             em.getTransaction().begin();
-            out.println("here we go<br>");
-            int fileuploader = Integer.parseInt(request.getParameter("fileuploader"));
-            User u = (User)em.createNamedQuery("User.findByUid").setParameter("uid", fileuploader).getSingleResult();
+            out.println("Transaction created<br>");
+//            int fileuploader = Integer.parseInt(request.getParameter("fileuploader"));
+            User u = (User) em.createNamedQuery("User.findByUid").setParameter("uid", 1).getSingleResult();
             out.println(u.getUname() + "<br>");
             //image title, description, Date generated in java the name of the file
-            Image img = new Image(request.getParameter("filetitle"), request.getParameter("filedesc"), new Date(), request.getPart("file").getSubmittedFileName(), u);
+//            Image img = new Image(request.getParameter("titleinput"), request.getParameter("descriptioninput"), new Date(), request.getPart("file").getSubmittedFileName(), u);
+            Image img = new Image(request.getParameter("titleinput"), request.getParameter("descriptioninput"), new Date(), request.getPart("file").getSubmittedFileName(), u);
             out.println(img.getTitle() + "<br>");
             em.persist(img);
-            em.getTransaction().commit(); 
+            em.getTransaction().commit();
             out.println("File in DB successfully!");
-        }catch(Exception e){
+        } catch (Exception e) {
             out.println("BOOM! " + e);
         }
         emf.close();
-    }  
+    }
 }

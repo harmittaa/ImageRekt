@@ -5,7 +5,9 @@ $(document).ready(function () {
     var PID = 0;
     var logged = false;
     var chosenImage;
-    localStorage.setItem('loggedin', logged);
+    var username = "";
+    var password = "";
+//    localStorage.setItem('loggedin', logged);
 
     function loop() {
         getJsonGallery();
@@ -46,15 +48,27 @@ $(document).ready(function () {
         $('#uploadUpMod').modal('show');
     });
 
+var user = {
+    data : {user : localStorage.getItem('user')}
+};
+
+//NEW UPLOAD BUTTON
+    $("#upload").click(function () {
+        alert("clicky");
+        $("#uploadform").ajaxSubmit(user);
+        alert("Success!");
+        return false;
+    });
+
 //UPLOADCHECK 
 
 //LOGO HOMEBUTTON
     $('#logo').click(function () {
-        window.location = "homePage.html";
+        window.location = "index.html";
     });
 //HOME BUTTON
     $('#home').click(function () {
-        window.location = "homePage.html";
+        window.location = "index.html";
     });
 
 //BUTTON TO MY PROFILE PAGE
@@ -93,6 +107,11 @@ $(document).ready(function () {
 
 //LOGIN CHECK FROM LOGIN MODAL TODO: tarkista matchaakö käyttäjänimi ja salasana tietokannan kanssa! sen jälkeen close loginmod
     $('#logincheck').click(function () {
+        username = $("#usernameLogIn").val();
+        password = $("#passwordLogIn").val();
+        alert("Username " + username + " password " + password);
+        checkUserLogin(username, password);
+
         logged = true;
     });
 
@@ -170,5 +189,25 @@ function getJsonGallery() {
             alert("user clicked " + this.id);
             localStorage.setItem('chosenImage', this.id);
         });
+    });
+}
+
+function checkUserLogin(username, password) {
+    alert("In method User " + username + " pass " + password);
+    $.ajax({
+        type: "GET",
+        url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin/" + username + "/" + password,
+        dataType: "text",
+        success: function (response) {
+            if (response === "false") {
+                alert("uname or pass wrong");
+            }
+            else {
+                alert("login succesful");
+                localStorage.setItem('loggedin', true);
+                localStorage.setItem('user', response);
+                $('#logInMod').modal('hide');
+            }
+        }
     });
 }

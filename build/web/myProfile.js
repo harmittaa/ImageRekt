@@ -36,16 +36,16 @@ function centerize(){
 /**************************NAVBAR FUNCTIONS*************************/
 //LOGO HOMEBUTTON
 $('#logo').click(function(){
-	window.location = "file:///Users/Juhani/Desktop/frontEnd/homePage.html";
+	window.location = "index.html";
 });
 //HOME BUTTON
 $('#home').click(function(){
-	window.location = "file:///Users/Juhani/Desktop/frontEnd/homePage.html";
+	window.location = "index.html";
 });
 
 //BUTTON TO MY PROFILE PAGE
 $('#myprofile').click(function(){
-	window.location = "file:///Users/Juhani/Desktop/frontEnd/myProfile.html";
+	window.location = "index.html";
 	//TODO: IF NOT LOGGEG IN THEN TO LOG IN PAGE
 });
 

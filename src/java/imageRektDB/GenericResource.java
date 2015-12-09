@@ -131,6 +131,7 @@ public class GenericResource {
         // loop through all the images and add them into the JsonObject
         jsonObjectBuilder = jsonImageObjectBuilder.add("path", this.queryImage.getPath());
         jsonObjectBuilder = jsonImageObjectBuilder.add("title", this.queryImage.getTitle());
+        jsonObjectBuilder = jsonImageObjectBuilder.add("description", this.queryImage.getDescription());
         // build the JsonObject to finalize it
         jsonImageObject = jsonObjectBuilder.build();
         // add the JsonObject to the ArrayBuilder (same as adding it to the array)
@@ -171,12 +172,12 @@ public class GenericResource {
     }
 
     // add comment to image
-    @POST
-    @Path("commentImage")
+    @GET
+    @Path("commentImage/{comment}/{image}/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String commentImage(@FormParam("comment") String comment,
-            @FormParam("IID") String iid,
-            @FormParam("UID") String uid) {
+    public String commentImage(@PathParam("comment") String comment,
+            @PathParam("image") String iid,
+            @PathParam("user") String uid) {
         createTransaction();
         this.searchIID = Integer.parseInt(iid);
         this.searchUID = Integer.parseInt(uid);
@@ -420,19 +421,19 @@ public class GenericResource {
     }
 
     // gets username and password and checks if matching user is found
-    @POST
-    @Path("checkUserLogin")
+    @GET
+    @Path("checkUserLogin/{user}/{password}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String checkUserLogin(@FormParam("username") String username,
-            @FormParam("password") String password) {
+    public String checkUserLogin(@PathParam("user") String username,
+            @PathParam("password") String password) {
         createTransaction();
         this.userList = em.createNamedQuery("User.findAll").getResultList();
         for (User u : this.userList) {
             if (u.getUname().equals(username) && u.getUpass().equals(password)) {
-                return "Logged in as user " + u.getUname() + ".";
+                return "" + u.getUid();
             }
         }
-        return "User " + username + " wasn't found in the database.";
+        return "false";
     }
 
     //find user uploaded images

@@ -10,19 +10,7 @@ $(document).ready(function () {
 
     function draw() {
         getImageByIID();
-        //Create placeholder spaces for images and text fields
-        $('#picturediv').append('<img id=' + myID + ' src="" width="300" height="300" alt="image">');
-        $('#picturediv').append('<p id=' + PID + '>"TITLE"</p>');
-        $('#picturediv').append('<p id=' + PID + '>"DESCRIPTION Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Sed posuere interdum sem. Quisque ligula eros ullamcorper quis, lacinia quis facilisis sed sapien. Mauris varius diam vitae arcu."</p>');
-
-        //get item path from local storage
-        var piirrä = localStorage.getItem('valittuKuva');
-
-        //Draw images into their places
-        $('#' + myID).attr("src", piirrä);
-
-        //attribute textfield for image
-        $('#' + myID).text("KUVA-ATTRIBUUTTI");
+        getImageComments();
     }
 
     function centerize() {
@@ -34,7 +22,9 @@ $(document).ready(function () {
         var commentDate = localStorage.getItem('timeStamp');
         var newcomment = $('#commentfield').val();
         $('#commentfield').val('');
-        $('#commentdiv').append('<p> <b>Username:</b> ' + newcomment + '	' + '<i>' + commentDate + '</i>' + '</p>'); //TODO LYHENNÄ TIMESTAMP
+        commentImage(newcomment);
+
+//        $('#commentdiv').append('<p> <b>Username:</b> ' + newcomment + '	' + '<i>' + commentDate + '</i>' + '</p>'); //TODO LYHENNÄ TIMESTAMP
     });
 
     /**************************DRAWING IMAGE*************************/
@@ -42,17 +32,17 @@ $(document).ready(function () {
     /**************************NAVBAR FUNCTIONS*************************/
 //LOGO HOMEBUTTON
     $('#logo').click(function () {
-        window.location = "file:///Users/Juhani/Desktop/frontEnd/homePage.html";
+        window.location = "index.html";
     });
 
 //HOME BUTTON
     $('#home').click(function () {
-        window.location = "file:///Users/Juhani/Desktop/frontEnd/homePage.html";
+        window.location = "index.html";
     });
 
 //BUTTON TO MY PROFILE PAGE
     $('#myprofile').click(function () {
-        window.location = "file:///Users/Juhani/Desktop/frontEnd/myProfile.html";
+        window.location = "index.html";
         //TODO: IF NOT LOGGEG IN THEN TO LOG IN PAGE
     });
 
@@ -132,32 +122,75 @@ $(document).ready(function () {
 }); //DOCUMENT READY
 
 var iid = 0;
+var uid = 0;
+var comment = "";
+var user = "";
+var time = "";
 
 function getImageByIID() {
     iid = localStorage.getItem('chosenImage');
     $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageByIID/" + iid, function (data) {
         $.each(data, function (index, value) {
+//            console.log("index " + index + " value " + value);
+            $.each(value, function (index, value) {
+//                console.log("Nr2 index " + index + " value " + value);
+                $.each(value, function (index, value) {
+//                    console.log("Nr3 index " + index + " value " + value);
+                    if (index === "path") {
+                        $('#picturediv').append('<img src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
+                    }
+                    else if (index === "title") {
+                        $('#picturediv').append('<p>"' + value + '"</p>');
+                    }
+                    else if (index === "description") {
+                        $('#picturediv').append('<p>"' + value + '"</p>');
+                    }
+
+                });
+            });
+        });
+    });
+}
+
+function getImageComments() {
+    iid = localStorage.getItem('chosenImage');
+    $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageComments/" + iid, function (data) {
+        $.each(data, function (index, value) {
             console.log("index " + index + " value " + value);
             $.each(value, function (index, value) {
                 console.log("Nr2 index " + index + " value " + value);
                 $.each(value, function (index, value) {
-                console.log("Nr3 index " + index + " value " + value);
-
-
-//                    if (index === "title") {
-//                        console.log("this is the compare for image " + index.localeCompare("title"));
-//                        console.log("image found " + index);
-//                        $("#responseDIV").append("<p>" + value + "</p><br>");
-//                    }
-//                    else if (index === "path") {
-//                        console.log("Title found " + index);
-//                        $("#responseDIV").append("<img src='http://192.168.56.1/test/" + value + "' width='100px' height='100px'><br>");
-//                    }
-//                    else if (index === "iid") {
-//                        console.log("IID found " + index);
-//                    }
+                    console.log("Nr index " + index + " value " + value);
+                    if (index === "comment") {
+                        console.log("comment found " + value);
+                        comment = value;
+                    }
+                    else if (index === "user") {
+                        console.log("User found " + index);
+                        user = value;
+                    }
+                    else if (index === "time") {
+                        console.log("Time found " + index);
+                        time = value;
+                    }
                 });
+                $('#commentdiv').append('<p> <b>' + user + ':</b> ' + comment + '	' + '<i>' + time + '</i>' + '</p>');
             });
         });
+    });
+}
+
+function commentImage(comment) {
+    iid = localStorage.getItem('chosenImage');
+    uid = localStorage.getItem("user");
+    $.ajax({
+        type: "GET",
+        url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/commentImage/" + comment + "/" + iid + "/" + uid,
+        dataType: "text",
+        success: function (response) {
+            alert("Last " + response);
+            $("#response").append(response);
+            getImageComments();
+        }
     });
 }
