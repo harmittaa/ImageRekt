@@ -48,17 +48,22 @@ $(document).ready(function () {
         $('#uploadUpMod').modal('show');
     });
 
-var user = {
-    data : {user : localStorage.getItem('user')}
-};
+    var options = {
+        data: {user: localStorage.getItem('user')},
+        target: "#hiddenResponse",
+        resetForm: true,
+        clearForm: true,
+        success: showResponse
+    };
 
 //NEW UPLOAD BUTTON
     $("#upload").click(function () {
         alert("clicky");
-        $("#uploadform").ajaxSubmit(user);
-        alert("Success!");
+        $("#uploadform").ajaxSubmit(options);
+        alert("Success! ");
         return false;
     });
+
 
 //UPLOADCHECK 
 
@@ -211,3 +216,24 @@ function checkUserLogin(username, password) {
         }
     });
 }
+
+function getImageDescription(image) {
+    alert("Getting image desc for IID " + image);
+    $.ajax({
+        type: "GET",
+        url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageDescription/" + image,
+        dataType: "text",
+        success: function (response) {
+            alert("returning response " + response);
+            parseDescription(response, image);
+        }
+    });
+}
+
+function showResponse(responseText) {
+    localStorage.setItem("chosenImage", responseText);
+    getImageDescription(responseText);
+    window.location = "picturePage.html";
+}
+
+
