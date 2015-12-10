@@ -190,6 +190,9 @@ function commentImage(comment) {
         success: function (response) {
             alert("Last " + response);
             $("#response").append(response);
+            // empty the comments and then load all the comments
+            $('#commentdiv').empty();
+            $('#commentdiv').append("<h4>Comments</h4>");
             getImageComments();
         }
     });
