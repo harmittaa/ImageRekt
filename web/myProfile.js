@@ -3,6 +3,8 @@ $(document).ready(function() {
 /**************************DRAWING IMAGE*************************/
 var myID=0;
 var PID=0;
+var textlimit = 140;
+var titlelimit = 30;
 
 function loop(){
 for(var i=0; i<5; i++){
@@ -34,6 +36,46 @@ function centerize(){
 /**************************DRAWING IMAGE*************************/
 
 /**************************NAVBAR FUNCTIONS*************************/
+//REMOVE LOADED FILE
+//TODO
+
+//UPLOAD BUTTON
+    $('#uploadbutton').click(function () {
+        $('#uploadUpMod').modal('show');
+    });
+
+var user = {
+    data : {user : localStorage.getItem('user')}
+};
+
+//NEW UPLOAD BUTTON
+    $("#upload").click(function () {
+        alert("clicky");
+        $("#uploadform").ajaxSubmit(user);
+        alert("Success!");
+        return false;
+    });
+
+//TITLE LIMIT
+$('#titleinput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,titlelimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+         }); 
+
+
+
+//DESCRIPTION LIMIT
+ $('#descriptioninput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,textlimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+            $('#remain').text(remain);
+         }); 
+
+
 //LOGO HOMEBUTTON
 $('#logo').click(function(){
 	window.location = "index.html";

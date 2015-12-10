@@ -15,7 +15,7 @@
 
     <body>
 
-        <nav class="navbar navbar-default">
+        <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container-fluid">
 
                 <div class="navbar-header">
@@ -55,7 +55,7 @@
             </div>
 
             <div class="row">
-                <div id="footerID" class="col-md-8 col-xs-12"><p>Unless otherwise stated, this website and all content within this site are the property of ImageRekt and are protected by copyright and other intellectual property laws.</p></div>
+                <div class="col-md-8 col-xs-12"><p>Unless otherwise stated, this website and all content within this site are the property of ImageRekt and are protected by copyright and other intellectual property laws.</p></div>
             </div>
         </div>
 
@@ -81,14 +81,15 @@
 
                         <textarea class="form-control" rows="1" id="titleinput" name="titleinput" placeholder="Title"></textarea>
                         <br>
-                        <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description"></textarea>
+                        <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description (max 140 characters)"></textarea>
+                        <p id="remain"></p>
                         <br>
-                        <input type="submit" value="Upload" name="TEST;)" id="upload"/>
+                        <input type="submit" value="Upload" name="TEST;)" id="upload"class="btn btn-success btn-sm"/>
+
                     </form>
                     </div>
 
                     <div class="modal-footer">
-                        <button id="uploadcheck" type="button" class="btn btn-success">Upload!</button>
                     </div>
                 </div>
             </div>
@@ -188,7 +189,7 @@
                 </div>
             </div>
         </div>
-        <p id="hiddenResponse" style="display: none"> </p>
+
 
     </body>
 </html>

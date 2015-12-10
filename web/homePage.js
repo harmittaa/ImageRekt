@@ -7,6 +7,9 @@ $(document).ready(function () {
     var chosenImage;
     var username = "";
     var password = "";
+    var textlimit = 140;
+var titlelimit = 30;
+
 //    localStorage.setItem('loggedin', logged);
 
     function loop() {
@@ -48,24 +51,36 @@ $(document).ready(function () {
         $('#uploadUpMod').modal('show');
     });
 
-    var options = {
-        data: {user: localStorage.getItem('user')},
-        target: "#hiddenResponse",
-        resetForm: true,
-        clearForm: true,
-        success: showResponse
-    };
+var user = {
+    data : {user : localStorage.getItem('user')}
+};
 
 //NEW UPLOAD BUTTON
     $("#upload").click(function () {
         alert("clicky");
-        $("#uploadform").ajaxSubmit(options);
-        alert("Success! ");
+        $("#uploadform").ajaxSubmit(user);
+        alert("Success!");
         return false;
     });
 
+//TITLE LIMIT
+$('#titleinput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,titlelimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+         }); 
 
-//UPLOADCHECK 
+
+
+//DESCRIPTION LIMIT
+ $('#descriptioninput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,textlimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+            $('#remain').text(remain);
+         }); 
 
 //LOGO HOMEBUTTON
     $('#logo').click(function () {
@@ -216,24 +231,3 @@ function checkUserLogin(username, password) {
         }
     });
 }
-
-function getImageDescription(image) {
-    alert("Getting image desc for IID " + image);
-    $.ajax({
-        type: "GET",
-        url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageDescription/" + image,
-        dataType: "text",
-        success: function (response) {
-            alert("returning response " + response);
-            parseDescription(response, image);
-        }
-    });
-}
-
-function showResponse(responseText) {
-    localStorage.setItem("chosenImage", responseText);
-    getImageDescription(responseText);
-    window.location = "picturePage.html";
-}
-
-
