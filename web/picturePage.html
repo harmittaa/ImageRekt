@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ImageRekt | Image</title>
     <link href="bootstrap.min.css" rel="stylesheet">
+	<!-- Social Share Kit CSS -->
+	<link rel="stylesheet" href="your-path/social-share-kit.css" type="text/css">
+
 	<script src="jquery-1.11.3.min.js"></script>
     <script src="bootstrap.min.js"></script>
     
@@ -14,11 +17,21 @@
   </head>
   
   <body>
-    
+    <aside id="sticky-social">
+    	<ul>
+	        <li><a href="#" class="entypo-facebook" target="_blank"><span>Facebook</span></a></li>
+	        <li><a href="#" class="entypo-twitter" target="_blank"><span>Twitter</span></a></li>
+	        <li><a href="#" class="entypo-instagrem" target="_blank"><span>Instagram</span></a></li>
+	        <li><a href="#" class="entypo-heart" target="_blank"><span>Favourite</span></a></li>
+    	</ul>
+	</aside>
     <nav class="navbar navbar-default">
 	 
 	 <div class="container-fluid">
 		<div class="navbar-header">
+
+<button id="uploadbutton" type="button" class="btn btn-success">Upload</button>
+
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNav">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
@@ -46,16 +59,37 @@
 		<div class="row" id="rowId">
 			<div class="col-md-3 col-sm-6" id="picturediv">
 				<!--PICTURE FROM JS-->
+
 			</div>
 
-			<div id="favouritediv">
-				
-				<button id="favouritebutton" type="button" class="btn btn-danger"><3</button>
+			<div id="favouritediv" class="rating">
+				<span id="rate5" value="5">☆</span>
+				<span id="rate4" value="4">☆</span>
+				<span id="rate3" value="3">☆</span>
+				<span id="rate2" value="2">☆</span>
+				<span id="rate1" value="1">☆</span>
 			</div>
 
 			<div class="col-md-3 col-sm-6" id="commentdiv">
 				<h4>COMMENTS</h4>
 				<!--COMMENTS FROM JS-->
+
+				<!--COMMENT BUBBLE-->
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-5">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+								<strong id="username">USERNAME</strong> <span class="text-muted" id="timestamp">TIMESTAMP</span>
+								</div>
+								<div class="panel-body" id="commentbubble">
+								COMMENT
+								</div><!-- /panel-body -->
+							</div><!-- /panel panel-default -->
+						</div><!-- /col-sm-5 -->
+					</div><!-- /row -->
+				</div><!-- /container -->
+				<!--COMMENT BUBBLE-->
 			</div>
 
 				<!--LEAVE A COMMENT-->
@@ -73,6 +107,40 @@
 	</div>
 
 <!--MODAL STUFf-->
+
+<!--UPLOAD IMAGE-->
+        <div class="modal fade" id="uploadUpMod" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title">Upload an image give it title and description</h4>
+                    </div>
+                    <div class="modal-body">
+                    <form id="uploadform" method="POST" action="upload" enctype="multipart/form-data">
+<!--                        <form id="form1">-->
+                            <img id="blah" src="#" width="150" height="150">
+                            <input id="imgInp" type="file" name="file" class="file">
+                            <button id="removebutton" type="button" class="btn btn-danger btn-sm">Remove</button>
+                        <!--</form>-->
+                        <br>
+
+                        <textarea class="form-control" rows="1" id="titleinput" name="titleinput" placeholder="Title"></textarea>
+                        <br>
+                        <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description (max 140 characters)"></textarea>
+                        <p id="remain"></p>
+                        <br>
+                        <input type="submit" value="Upload" name="TEST;)" id="upload"class="btn btn-success btn-sm"/>
+
+                    </form>
+                    </div>
+
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
 
 <!--SIGN UP-->
 <div class="modal fade" id="signUpMod" tabindex="-1" role="dialog">

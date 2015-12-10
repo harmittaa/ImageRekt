@@ -3,6 +3,10 @@ $(document).ready(function () {
     /**************************DRAWING IMAGE*************************/
     var myID = 0;
     var PID = 0;
+    var textlimit = 140;
+    var commentlimit =140;
+    var titlelimit = 30;
+    var rating;
     localStorage.setItem('timeStamp', Date());
 
     draw();
@@ -19,10 +23,16 @@ $(document).ready(function () {
 
 // LEAVING A COMMENT  IN THE id=commentdiv
     $('#submitcomment').click(function () {
+        
+        if($('#commentfield').vall()===''){
+            alert("You cannot leave an empty comment.");
+        }
+        else{
         var commentDate = localStorage.getItem('timeStamp');
         var newcomment = $('#commentfield').val();
         $('#commentfield').val('');
         commentImage(newcomment);
+        }
 
 //        $('#commentdiv').append('<p> <b>Username:</b> ' + newcomment + '	' + '<i>' + commentDate + '</i>' + '</p>'); //TODO LYHENNÄ TIMESTAMP
     });
@@ -30,6 +40,62 @@ $(document).ready(function () {
     /**************************DRAWING IMAGE*************************/
 
     /**************************NAVBAR FUNCTIONS*************************/
+//REMOVE LOADED FILE
+//TODO
+
+
+//RATING
+$('span').click(function(){
+    rating=$('span', 'value');
+    //alert($(rating));
+    $('this').css({"color": "yellow"});
+});
+
+//UPLOAD BUTTON
+    $('#uploadbutton').click(function () {
+        $('#uploadUpMod').modal('show');
+    });
+
+var user = {
+    data : {user : localStorage.getItem('user')}
+};
+
+//NEW UPLOAD BUTTON
+    $("#upload").click(function () {
+        alert("clicky");
+        $("#uploadform").ajaxSubmit(user);
+        alert("Success!");
+        return false;
+    });
+
+//TITLE LIMIT
+$('#titleinput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,titlelimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+         }); 
+
+
+
+//DESCRIPTION LIMIT
+ $('#descriptioninput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,textlimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+            $('#remain').text(remain);
+         }); 
+
+
+//COMMENT LIMIT
+ $('#commentfield').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,commentlimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+         });  
+
 //LOGO HOMEBUTTON
     $('#logo').click(function () {
         window.location = "index.html";
@@ -190,9 +256,6 @@ function commentImage(comment) {
         success: function (response) {
             alert("Last " + response);
             $("#response").append(response);
-            // empty the comments and then load all the comments
-            $('#commentdiv').empty();
-            $('#commentdiv').append("<h4>Comments</h4>");
             getImageComments();
         }
     });
