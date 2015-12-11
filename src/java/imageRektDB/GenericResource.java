@@ -7,6 +7,7 @@ package imageRektDB;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -62,15 +63,11 @@ public class GenericResource {
     private ArrayList<Image> userImageArray;
     private ArrayList<String> userArrayList;
     private ArrayList<String> galleryImages;
-//    private ArrayList<Integer> imageRatings;
     private Collection<User> userCollection;
     private Collection<Image> imageCollection;
-//    private Collection<Comment> commentCollection;
     private Collection<Tag> tagCollection;
-//    private List<Image> userImageList;
     private List<Image> imageList;
     private List<Image> imageQuery;
-//    private List<Image> imageQueryJSON;
     private List<Rate> rateList;
     private List<User> userList;
     private List<Tag> tagList;
@@ -78,7 +75,6 @@ public class GenericResource {
     private List<String> tagContentList;
     private User newUser;
     private User queryUser;
-//    private Image foundImage;
     private Image queryImage;
     private Rate newRate;
     private Comment newComment;
@@ -151,18 +147,18 @@ public class GenericResource {
     }
 
     //for registering a new user from index.html
-    @POST
-    @Path("registerUser")
+    @GET
+    @Path("registerUser/{username}/{email}/{password}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String registerUser(@FormParam("username") String username,
-            @FormParam("email") String email,
-            @FormParam("password") String password) {
+    public String registerUser(@PathParam("username") String username,
+            @PathParam("email") String email,
+            @PathParam("password") String password) {
         createTransaction();
         this.userList = em.createNamedQuery("User.findAll").getResultList();
         for (User u : this.userList) {
-            if (u.getUname().equals(username)) {
+            if (u.getUname().equalsIgnoreCase(username)) {
                 endTransaction();
-                return "Username already found, add another username";
+                return "UNAME_FOUND";
             }
         }
         newUser = new User();
@@ -171,12 +167,12 @@ public class GenericResource {
         newUser.setUemail(email);
         em.persist(newUser);
         // create query for finding the user just created
-        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uname LIKE :UNAME").setParameter("UNAME", username).getResultList()) {
-            return "Found just created user from database " + p.getUname() + " with email " + p.getUemail() + " UID " + p.getUid();
-        }
+//        for (User p : (List<User>) em.createQuery("SELECT c FROM User c WHERE c.uname LIKE :UNAME").setParameter("UNAME", username).getResultList()) {
+//            return "Found just created user from database " + p.getUname() + " with email " + p.getUemail() + " UID " + p.getUid();
+//        }
         endTransaction();
         //if the user creation failed
-        return "Somethign went wrong! User with info was not created " + newUser.getUname() + " " + newUser.getUemail();
+        return "CREATED";
     }
 
     // add comment to image
@@ -266,12 +262,12 @@ public class GenericResource {
         createTransaction();
         this.queryUser = (User) em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getSingleResult();
         this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
-        
+
         if (this.queryUser.getImageCollection().contains(this.queryImage)) {
             endTransaction();
             return "ALREADY";
         }
-        
+
         // set the users fav images into the imageCollection
         // add the current image to that collection
         this.imageCollection = this.queryUser.getImageCollection();
@@ -351,7 +347,7 @@ public class GenericResource {
         endTransaction();
         return jsonImageArray;
     }
-    
+
     @GET
     @Path("getImagePath/{image}")
     @Produces("text/plain")
@@ -432,35 +428,23 @@ public class GenericResource {
     }
 
     //find user uploaded images
-    @POST
-    @Path("findUserImages")
+    @GET
+    @Path("findUserImages/{user}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json")
-    public JsonArray findUserImages(@FormParam("uid") String uid) {
+    public JsonArray findUserImages(@PathParam("user") String uid) {
         this.userImageArray = new ArrayList();
         this.searchUID = Integer.parseInt(uid);
         createTransaction();
-        this.userList = em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getResultList();
+        this.queryUser = (User) em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getSingleResult();
         this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
-        // setting user as null, if there is no user, it can be checked
-        // creating an empty jsonArray to return in case user is not found
-        this.queryUser = null;
         this.emptyJsonArray = Json.createArrayBuilder().add("User not found").build();
-        for (User u : this.userList) {
-            if (u.getUid() == this.searchUID) {
-                this.queryUser = u;
-            }
-        }
-        // if the queryUser is still set as null = the user was not found from db
-        if (this.queryUser == null) {
-            endTransaction();
-            return emptyJsonArray;
-        }
         for (Image img : imageQuery) {
             if (img.getUid() == this.queryUser) {
                 this.userImageArray.add(img);
             }
         }
+        Collections.reverse(this.userImageArray);
         // create a objectBuilder
         JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
         // create a JsonObject
@@ -468,17 +452,61 @@ public class GenericResource {
         // create a JsonArrayBuilder
         JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
         // loop through all the images in users fav image collection and add them into the JsonObject
-        for (Image img : this.userImageArray) {
-            jsonObjectBuilder = jsonImageObjectBuilder.add("path", img.getPath());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("title", img.getTitle());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("user", img.getUid().toString());
+        for (Image i : this.userImageArray) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
             jsonImageArrayBuilder.add(jsonImageObject);
         }
         // create a JsonArray from the JsonArrayBuilder
-        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).add("Array " + this.userImageArray.size() + " size. " + " query user " + this.queryUser.getUid()).build();
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
+        endTransaction();
+        return jsonImageArray;
+    }
+
+    //find user uploaded images
+    @GET
+    @Path("findUsernameImages/{user}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    public JsonArray findUsernameImages(@PathParam("user") String username) {
+        this.userImageArray = new ArrayList();
+        createTransaction();
+        try {
+            this.queryUser = (User) em.createNamedQuery("User.findByUname").setParameter("uname", username).getSingleResult();
+        } catch (Exception e) {
+            endTransaction();
+            this.emptyJsonArray = Json.createArrayBuilder().add("User not found").build();
+            return this.emptyJsonArray;
+        }
+        this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
+        for (Image img : imageQuery) {
+            if (img.getUid() == this.queryUser) {
+                this.userImageArray.add(img);
+            }
+        }
+        Collections.reverse(this.userImageArray);
+        // create a objectBuilder
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the images in users fav image collection and add them into the JsonObject
+        for (Image i : this.userImageArray) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+            // build the JsonObject to finalize it
+            jsonImageObject = jsonObjectBuilder.build();
+            // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+            jsonImageArrayBuilder.add(jsonImageObject);
+        }
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();
         return jsonImageArray;
     }
@@ -489,15 +517,16 @@ public class GenericResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public JsonArray findImageByName(@PathParam("title") String title) {
         createTransaction();
-        this.imageQuery = em.createNamedQuery("Image.findByTitle").setParameter("title", title).getResultList();
+//        this.imageQuery = em.createNamedQuery("Image.findByTitle").setParameter("title",title + "%").getResultList();
+        this.imageQuery = em.createNamedQuery("Image.findByTitleWild").setParameter("1", "%" + title + "%").getResultList();
         if (!this.imageQuery.isEmpty()) {
             JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
             // create a JsonArrayBuilder
             JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
             // loop through all the images in users fav image collection and add them into the JsonObject
             for (Image i : this.imageQuery) {
-                jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
                 jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+                jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
                 jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
                 // build the JsonObject to finalize it
                 jsonImageObject = jsonImageObjectBuilder.build();
@@ -508,7 +537,10 @@ public class GenericResource {
             this.jsonImageArray = jsonImageArrayBuilder.build();
         } else {
             this.emptyJsonArray = Json.createArrayBuilder().add("No images with title").build();
+            endTransaction();
+            return emptyJsonArray;
         }
+        endTransaction();
         return jsonImageArray;
     }
 
@@ -738,13 +770,13 @@ public class GenericResource {
         // create a JsonArrayBuilder
         JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
         // loop through all the images and add them into the JsonObject
-//        for (Image i : images) {
-        
-        
-        for (int j = images.size(); j<1; j--) {            
-            jsonObjectBuilder = jsonImageObjectBuilder.add("path", images.get(j).getPath());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("title", images.get(j).getTitle());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", images.get(j).getIid());
+        Collections.reverse(images);
+
+//        for (int j = images.size(); j<1; j--) {            
+        for (Image i : images) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
@@ -790,19 +822,19 @@ public class GenericResource {
                         }
                     }
                 } else {
-                        this.newTag = new Tag(word);
-                        em.persist(this.newTag);
-                        this.newTagList = em.createNamedQuery("Tag.findAll").getResultList();
-                        this.newTag = this.newTagList.get(this.newTagList.size() - 1);
+                    this.newTag = new Tag(word);
+                    em.persist(this.newTag);
+                    this.newTagList = em.createNamedQuery("Tag.findAll").getResultList();
+                    this.newTag = this.newTagList.get(this.newTagList.size() - 1);
 
-                        this.imageCollection = this.newTag.getImageCollection();
-                        this.imageCollection.add(this.queryImage);
+                    this.imageCollection = this.newTag.getImageCollection();
+                    this.imageCollection.add(this.queryImage);
 
-                        this.tagCollection = this.queryImage.getTagCollection();
-                        this.tagCollection.add(this.newTag);
+                    this.tagCollection = this.queryImage.getTagCollection();
+                    this.tagCollection.add(this.newTag);
 
-                        this.queryImage.setTagCollection(this.tagCollection);
-                        this.newTag.setImageCollection(this.imageCollection);
+                    this.queryImage.setTagCollection(this.tagCollection);
+                    this.newTag.setImageCollection(this.imageCollection);
                 }
             }
         }

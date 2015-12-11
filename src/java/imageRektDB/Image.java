@@ -41,7 +41,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Image.findByTitle", query = "SELECT i FROM Image i WHERE i.title = :title"),
     @NamedQuery(name = "Image.findByDescription", query = "SELECT i FROM Image i WHERE i.description = :description"),
     @NamedQuery(name = "Image.findByUploadtime", query = "SELECT i FROM Image i WHERE i.uploadtime = :uploadtime"),
-    @NamedQuery(name = "Image.findByPath", query = "SELECT i FROM Image i WHERE i.path = :path")})
+    @NamedQuery(name = "Image.findByPath", query = "SELECT i FROM Image i WHERE i.path = :path"),
+    @NamedQuery(name = "Image.findByTitleWild", query="SELECT i FROM Image i WHERE i.title LIKE ?1 ORDER BY i.iid ASC")})
+
 public class Image implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
