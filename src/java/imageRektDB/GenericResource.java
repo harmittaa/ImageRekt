@@ -266,20 +266,12 @@ public class GenericResource {
         createTransaction();
         this.queryUser = (User) em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getSingleResult();
         this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
-//        this.userList = em.createNamedQuery("User.findAll").getResultList();
-//        this.imageQuery = em.createNamedQuery("Image.findAll").getResultList();
-        // finding the user in question
-//        for (User u : this.userList) {
-//            if (u.getUid() == this.searchUID) {
-//                this.queryUser = u;
-//            }
-//        }
-//        // find the image in question
-//        for (Image i : this.imageQuery) {
-//            if (i.getIid() == this.searchIID) {
-//                this.queryImage = i;
-//            }
-//        }
+        
+        if (this.queryUser.getImageCollection().contains(this.queryImage)) {
+            endTransaction();
+            return "ALREADY";
+        }
+        
         // set the users fav images into the imageCollection
         // add the current image to that collection
         this.imageCollection = this.queryUser.getImageCollection();
@@ -292,7 +284,7 @@ public class GenericResource {
         this.queryImage.setUserCollection(this.userCollection);
         this.queryUser.setImageCollection(this.imageCollection);
         endTransaction();
-        return "Favourited image " + this.queryImage.getPath() + " for user " + this.queryUser.getUname();
+        return "DONE";
     }
 
     //unfavorite image
@@ -358,6 +350,17 @@ public class GenericResource {
         jsonImageArray = jsonImageArrayBuilder.build();
         endTransaction();
         return jsonImageArray;
+    }
+    
+    @GET
+    @Path("getImagePath/{image}")
+    @Produces("text/plain")
+    public String getImagePath(@PathParam("image") String iid) {
+        this.searchIID = Integer.parseInt(iid);
+        createTransaction();
+        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        endTransaction();
+        return this.queryImage.getPath();
     }
 
     //create or update image rating
@@ -514,26 +517,27 @@ public class GenericResource {
     @GET
     @Path("findRandomImage")
     @Produces("application/json")
-    public JsonArray findRandomImage() {
+    public String findRandomImage() {
         createTransaction();
         this.imageList = em.createNamedQuery("Image.findAll").getResultList();
         this.randomno = new Random();
         this.randomIID = this.randomno.nextInt(this.imageList.size());
         this.queryImage = this.imageList.get(randomIID);
-        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
-        // create a JsonArrayBuilder
-        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
-        // loop through all the images in users fav image collection and add them into the JsonObject
-        jsonObjectBuilder = jsonImageObjectBuilder.add("path", this.queryImage.getPath());
-        jsonObjectBuilder = jsonImageObjectBuilder.add("title", this.queryImage.getTitle());
-        jsonObjectBuilder = jsonImageObjectBuilder.add("iid", this.queryImage.getIid());
-        // build the JsonObject to finalize it
-        jsonImageObject = jsonImageObjectBuilder.build();
-        // add the JsonObject to the ArrayBuilder (same as adding it to the array)
-        jsonImageArrayBuilder.add(jsonImageObject);
-        // create a JsonArray from the JsonArrayBuilder
-        this.jsonImageArray = jsonImageArrayBuilder.build();
-        return jsonImageArray;
+//        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+//        // create a JsonArrayBuilder
+//        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+//        // loop through all the images in users fav image collection and add them into the JsonObject
+//        jsonObjectBuilder = jsonImageObjectBuilder.add("path", this.queryImage.getPath());
+//        jsonObjectBuilder = jsonImageObjectBuilder.add("title", this.queryImage.getTitle());
+//        jsonObjectBuilder = jsonImageObjectBuilder.add("iid", this.queryImage.getIid());
+//        // build the JsonObject to finalize it
+//        jsonImageObject = jsonImageObjectBuilder.build();
+//        // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+//        jsonImageArrayBuilder.add(jsonImageObject);
+//        // create a JsonArray from the JsonArrayBuilder
+//        this.jsonImageArray = jsonImageArrayBuilder.build();
+        endTransaction();
+        return "" + this.randomIID;
     }
 
     @POST
@@ -734,10 +738,13 @@ public class GenericResource {
         // create a JsonArrayBuilder
         JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
         // loop through all the images and add them into the JsonObject
-        for (Image i : images) {
-            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
-            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+//        for (Image i : images) {
+        
+        
+        for (int j = images.size(); j<1; j--) {            
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", images.get(j).getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", images.get(j).getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", images.get(j).getIid());
             // build the JsonObject to finalize it
             jsonImageObject = jsonObjectBuilder.build();
             // add the JsonObject to the ArrayBuilder (same as adding it to the array)
@@ -797,50 +804,9 @@ public class GenericResource {
                         this.queryImage.setTagCollection(this.tagCollection);
                         this.newTag.setImageCollection(this.imageCollection);
                 }
-
-//                for (Tag tag : this.tagList) {
-//                    if (tag.getTcontent().equalsIgnoreCase(word)) {
-//                        this.imageCollection = tag.getImageCollection();
-//                        this.imageCollection.add(this.queryImage);
-//
-//                        this.tagCollection = this.queryImage.getTagCollection();
-//                        this.tagCollection.add(tag);
-//
-//                        this.queryImage.setTagCollection(this.tagCollection);
-//                        tag.setImageCollection(this.imageCollection);
-//                    } else {
-//                        this.newTag = new Tag(word);
-//                        em.persist(this.newTag);
-//                        this.newTagList = em.createNamedQuery("Tag.findAll").getResultList();
-//                        this.newTag = this.newTagList.get(this.newTagList.size() - 1);
-//
-//                        this.imageCollection = this.newTag.getImageCollection();
-//                        this.imageCollection.add(this.queryImage);
-//
-//                        this.tagCollection = this.queryImage.getTagCollection();
-//                        this.tagCollection.add(this.newTag);
-//
-//                        this.queryImage.setTagCollection(this.tagCollection);
-//                        this.newTag.setImageCollection(this.imageCollection);
-//                    }
-//                }
             }
         }
 
-//        // create a objectBuilder
-//        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
-//        // create a JsonObject
-//        jsonImageObject = jsonImageObjectBuilder.build();
-//        // create a JsonArrayBuilder
-//        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
-//        // loop through all the images and add them into the JsonObject
-//        jsonObjectBuilder = jsonImageObjectBuilder.add("desc", this.queryImage.getDescription());
-//        // build the JsonObject to finalize it
-//        jsonImageObject = jsonObjectBuilder.build();
-//        // add the JsonObject to the ArrayBuilder (same as adding it to the array)
-//        jsonImageArrayBuilder.add(jsonImageObject);
-//        // create a JsonArray from the JsonArrayBuilder
-//        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();
 //        this.emptyJsonArray = Json.createArrayBuilder().add("WTF").build();
         return "Woot";

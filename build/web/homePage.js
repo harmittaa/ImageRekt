@@ -7,6 +7,9 @@ $(document).ready(function () {
     var chosenImage;
     var username = "";
     var password = "";
+    var textlimit = 140;
+    var titlelimit = 30;
+
 //    localStorage.setItem('loggedin', logged);
 
     function loop() {
@@ -64,8 +67,24 @@ $(document).ready(function () {
         return false;
     });
 
+    //TITLE LIMIT
+    $('#titleinput').keyup(function () {
+        var tlength = $(this).val().length;
+        $(this).val($(this).val().substring(0, titlelimit));
+        var tlength = $(this).val().length;
+        remain = parseInt(tlength);
+    });
 
-//UPLOADCHECK 
+
+//DESCRIPTION LIMIT
+    $('#descriptioninput').keyup(function () {
+        var tlength = $(this).val().length;
+        $(this).val($(this).val().substring(0, textlimit));
+        var tlength = $(this).val().length;
+        remain = parseInt(tlength);
+        $('#remain').text(remain);
+    });
+
 
 //LOGO HOMEBUTTON
     $('#logo').click(function () {
@@ -175,7 +194,7 @@ function getJsonGallery() {
                 $.each(value, function (index, value) {
 //                    console.log("nr3 inxed " + index + " value " + value);
                     if (index === ("path")) {
-                        $('#picturediv').append('<img id="' + placeholderID + '" class="picture2" src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
+                        $('#picturediv').append('<img id="' + placeholderID + '" class="picture2 img-thumbnail" src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
                     }
                     else if (index === ("title")) {
                         $('#picturediv').append('<p id=' + 1 + '>"' + value + '"</p>');
@@ -235,5 +254,4 @@ function showResponse(responseText) {
     getImageDescription(responseText);
     window.location = "picturePage.html";
 }
-
 

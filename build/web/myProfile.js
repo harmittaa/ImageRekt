@@ -1,124 +1,128 @@
 $(document).ready(function() {
-
-/**************************DRAWING IMAGE*************************/
+/**************************DRAWING IMAGE*************************/
 var myID=0;
 var PID=0;
-
+var textlimit = 140;
+var titlelimit = 30;
 function loop(){
 for(var i=0; i<5; i++){
 	myID ++;
 	PID ++;
-
 	//Create placeholder spaces for images and text fields
 	$('#picturediv').append('<img id=' + myID + ' src="" width="204" height="154" alt="image">');
 	$('#picturediv').append('<p id='+PID+'>"TITLE"</p>');
 	
 	//Draw images into their places
 	$('#' + myID).attr("src", "boxing.jpg");
-
 	//attribute textfield for image
 	$('#' + myID).text("KUVA-ATTRIBUUTTI");
-
 	//Image hyperlink to imagePage.html
 	$('#' + myID).wrap('<a href="file:///Users/Juhani/Desktop/frontEnd/picturePage.html"></a>');
 	
 }
 }
-
 function centerize(){
 	$('#picturediv').css({"text-align": "center"});
 }
-
-//loop();	 VAIN OMAT KUVAT NÄKYVIIN!
+//loop();	 VAIN OMAT KUVAT NÄKYVIIN!
 //centerize();
-/**************************DRAWING IMAGE*************************/
-
-/**************************NAVBAR FUNCTIONS*************************/
-//LOGO HOMEBUTTON
+/**************************DRAWING IMAGE*************************/
+/**************************NAVBAR FUNCTIONS*************************/
+//REMOVE LOADED FILE
+//TODO
+//UPLOAD BUTTON
+    $('#uploadbutton').click(function () {
+        $('#uploadUpMod').modal('show');
+    });
+var user = {
+    data : {user : localStorage.getItem('user')}
+};
+//NEW UPLOAD BUTTON
+    $("#upload").click(function () {
+        alert("clicky");
+        $("#uploadform").ajaxSubmit(user);
+        alert("Success!");
+        return false;
+    });
+//TITLE LIMIT
+$('#titleinput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,titlelimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+         }); 
+//DESCRIPTION LIMIT
+ $('#descriptioninput').keyup(function() {
+            var tlength = $(this).val().length;
+            $(this).val($(this).val().substring(0,textlimit));
+            var tlength = $(this).val().length;
+            remain = parseInt(tlength);
+            $('#remain').text(remain);
+         }); 
+//LOGO HOMEBUTTON
 $('#logo').click(function(){
 	window.location = "index.html";
 });
-//HOME BUTTON
+//HOME BUTTON
 $('#home').click(function(){
 	window.location = "index.html";
 });
-
-//BUTTON TO MY PROFILE PAGE
+//BUTTON TO MY PROFILE PAGE
 $('#myprofile').click(function(){
 	window.location = "index.html";
-	//TODO: IF NOT LOGGEG IN THEN TO LOG IN PAGE
+	//TODO: IF NOT LOGGEG IN THEN TO LOG IN PAGE
 });
-
 //SEARCH
 $('#search').click(function(){
 	$('#searchMod').modal('show');
 });
-
-//SUBMIT SEARCH
+//SUBMIT SEARCH
 //TODO!!!
-
-//LOGIN MODAL FROM HAMBURGER
+//LOGIN MODAL FROM HAMBURGER
 $('#login').click(function () {
 	$('#logInMod').modal('show');
 });
-
-//REGISTER FROM LOG IN
+//REGISTER FROM LOG IN
 $('#notuser').click(function(){
 	$('#signUpMod').modal('show');
 });
-
-//LOG IN FROM REGISTER
+//LOG IN FROM REGISTER
 $('#alreadyuser').click(function(){
 	$('#logInMod').modal('show');
 });
-
-//LOGIN CHECK FROM LOGIN MODAL TODO: tarkista matchaakö käyttäjänimi ja salasana kannan kanssa! sen jälkeen close loginmod
+//LOGIN CHECK FROM LOGIN MODAL TODO: tarkista matchaakö käyttäjänimi ja salasana kannan kanssa! sen jälkeen close loginmod
 $('#logincheck').click(function(){
-
 });
-
-
-//FORGOT PASSWORD
+//FORGOT PASSWORD
 $('#forgotpass').click(function(){
-	//$('#loginMod').modal('hide'); HIDING PART FROM HTML
+	//$('#loginMod').modal('hide'); HIDING PART FROM HTML
 	$('#forgotMod').modal('show');
 });
-
-//RETRIEVE PASSWORD
+//RETRIEVE PASSWORD
 //TODO
-
-
-//SIGN UP MODAL FROM HAMBURGER
+//SIGN UP MODAL FROM HAMBURGER
 $('#signup').click(function(){
 	$('#signUpMod').modal('show');
 });
-
-//SING UP CHECK FROM SIGN UP MODAL
+//SING UP CHECK FROM SIGN UP MODAL
 $('#signupcheck').click(function(){
 var password = $('#password').val();
 	var passwordconf = $('#passwordconf').val();
 	var length = password.length;
-
 	if (length<1){
 		alert("Don't leave it blank!");
 		event.preventDefault();
 	}
-
-	if(password != passwordconf){
+	if(password !== passwordconf){
 		alert("Passwords don't match!");
 		event.preventDefault();
 	}
-
 	var username = $('#username').val();
 	var email = $('#email').val();
-
 	alert(	"u-name: " + username + 
 			"password: " + password + 
 			"passwordconf: " +  passwordconf+
 			"e-mail: " + email);
-
 });
-/**************************NAVBAR FUNCTIONS*************************/
-
-
+/**************************NAVBAR FUNCTIONS*************************/
 }); //DOCUMENT READY

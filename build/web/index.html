@@ -15,7 +15,7 @@
 
     <body>
 
-        <nav class="navbar navbar-default">
+        <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container-fluid">
 
                 <div class="navbar-header">
@@ -71,24 +71,23 @@
                         <h4 class="modal-title">Upload an image give it title and description</h4>
                     </div>
                     <div class="modal-body">
-                    <form id="uploadform" method="POST" action="upload" enctype="multipart/form-data">
-<!--                        <form id="form1">-->
+                        <form id="uploadform" method="POST" action="upload" enctype="multipart/form-data">
+                            <!--                        <form id="form1">-->
                             <img id="blah" src="#" width="150" height="150">
                             <input id="imgInp" type="file" name="file" class="file">
                             <button id="removebutton" type="button" class="btn btn-danger btn-sm">Remove</button>
-                        <!--</form>-->
-                        <br>
+                            <!--</form>-->
+                            <br>
 
-                        <textarea class="form-control" rows="1" id="titleinput" name="titleinput" placeholder="Title"></textarea>
-                        <br>
-                        <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description"></textarea>
-                        <br>
-                        <input type="submit" value="Upload" name="TEST;)" id="upload"/>
-                    </form>
+                            <textarea class="form-control" rows="1" id="titleinput" name="titleinput" placeholder="Title"></textarea>
+                            <br>
+                            <textarea class="form-control" rows="4" id="descriptioninput" name="descriptioninput" placeholder="Description (max 140 characters)"></textarea>
+                            <p id="remain"></p>                        <br>
+                            <input type="submit" value="Upload" name="TEST;)" id="upload" class="btn btn-success btn-sm"/>
+                        </form>
                     </div>
 
                     <div class="modal-footer">
-                        <button id="uploadcheck" type="button" class="btn btn-success">Upload!</button>
                     </div>
                 </div>
             </div>
