@@ -1,6 +1,3 @@
-User Stories
+DB MODELS
 
-https://docs.google.com/document/d/11B0fY9JcFudp04p1MIz6ydTKS0UJQ_-pnbodnUm1xtg/edit?usp=sharing
-
-DB model
-https://docs.google.com/document/d/11B0fY9JcFudp04p1MIz6ydTKS0UJQ_-pnbodnUm1xtg/edit?usp=sharing
+https://docs.google.com/drawings/d/1w8o2cVMu0iQl5BIZ4jP5IeqpwTvDYpZ_IqrfPDsjy-E/edit?usp=sharing
