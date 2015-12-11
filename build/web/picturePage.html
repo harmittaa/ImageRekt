@@ -11,7 +11,7 @@
 
         <script src="jquery-1.11.3.min.js"></script>
         <script src="bootstrap.min.js"></script>
-
+        <script src="http://malsup.github.com/jquery.form.js"></script> 
         <script src="picturePage.js"></script>
         <link rel="stylesheet" type="text/css" href="mainPage.css">
     </head>
@@ -22,10 +22,10 @@
                 <li><a id="facebookShare" href="#" class="entypo-facebook" target="_blank"><span>Facebook</span></a></li>
                 <li><a id="twitterShare" href="#" class="entypo-twitter" target="_blank"><span>Twitter</span></a></li>
                 <li id="randomImage"><a id="randomImage1" href="#" class="entypo-shuffle"><span>Random</span></a></li>
-                <li><a id="favourite" href="#" class="entypo-heart"><span>Favourite</span></a></li>
+                <li><a id="favourite" href="#" class="entypo-heart"><span id="favSpan">Favourite</span></a></li>
             </ul>
         </aside>
-        <nav class="navbar navbar-default">
+        <nav id="navi" class="navbar navbar-default">
 
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -43,14 +43,17 @@
                 <div class="collapse navbar-collapse" id="myNav">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="#" id="home">Home</a></li>
-                        <li><a href="#" id="search">Search</a></li>
-                        <li><a href="#" id="myprofile">My Profile</a></li>
-                        <li><a href="#" id="signup">Signup</a></li>
+                        <!--<li><a href="#" id="search">Search</a></li>-->
+                        <!--<li><a href="#" id="myprofile">My Images</a></li>-->
+                        <!--<li><a href="#" id="myfavourites">My favourites</a></li>-->
+                        <li><a href="#" id="signup">Sign up</a></li>
+                        <li><a href="#" id="login">Login</a></li>
+                        <li><a href="#" id="logout">Logout</a></li>
                         <!--<li><a href="#"></a></li>-->
                     </ul>
-                    <ul class="nav navbar-nav navbar-right" id="login">
-                        <li><a href="#"><span></span> Login</a></li>
-                    </ul>
+                    <!--                    <ul class="nav navbar-nav navbar-right" id="login">
+                                            <li><a href="#"><span></span> Login</a></li>
+                                        </ul>-->
                 </div>
             </div>
         </nav>
@@ -71,47 +74,48 @@
                 </div>
                 <div id="currentRating">
                     <h4 id="currentRatingBox"></h4>
+                    <p id="totalRatings"></p>
                 </div>
-                
-                
+
+
 
                 <div class="col-md-3 col-sm-6" id="commentdiv">
                     <h4>COMMENTS</h4>
                     <!--COMMENTSÂ FROMÂ JS-->
 
-<!--                    COMMENTÂ BUBBLE
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm-5">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <strong id="username">USERNAME</strong> <span class="text-muted" id="timestamp">TIMESTAMP</span>
-                                    </div>
-                                    <div class="panel-body" id="commentbubble">
-                                        COMMENT
-                                    </div> /panel-body 
-                                </div> /panel panel-default 
-                                <br>
-                            </div> /col-sm-5 
-                            
-                            
-                            
-                        <div class="col-sm-5">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <strong id="username">USERNAME</strong> <span class="text-muted" id="timestamp">TIMESTAMP</span>
-                                    </div>
-                                    <div class="panel-body" id="commentbubble">
-                                        COMMENT
-                                    </div>
-                                </div>
-                                <br>
-                        </div>
-                            
-                            
-
-                        </div> /row 
-                    </div> /container -->
+                    <!--                    COMMENTÂ BUBBLE
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-sm-5">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <strong id="username">USERNAME</strong> <span class="text-muted" id="timestamp">TIMESTAMP</span>
+                                                        </div>
+                                                        <div class="panel-body" id="commentbubble">
+                                                            COMMENT
+                                                        </div> /panel-body 
+                                                    </div> /panel panel-default 
+                                                    <br>
+                                                </div> /col-sm-5 
+                                                
+                                                
+                                                
+                                            <div class="col-sm-5">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <strong id="username">USERNAME</strong> <span class="text-muted" id="timestamp">TIMESTAMP</span>
+                                                        </div>
+                                                        <div class="panel-body" id="commentbubble">
+                                                            COMMENT
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                            </div>
+                                                
+                                                
+                    
+                                            </div> /row 
+                                        </div> /container -->
                     <!--COMMENTÂ BUBBLE-->
                 </div>
 
@@ -125,7 +129,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-8 col-xs-12"><p>Unless otherwise stated, this website and all content within this site are the property of ImageRekt and are protected by copyright and other intellectual property laws.</p></div>
+                <div id="footerID" class="col-md-8 col-xs-12"><p>Unless otherwise stated, this website and all content within this site are the property of ImageRekt and are protected by copyright and other intellectual property laws.</p></div>
             </div>
         </div>
 
@@ -145,7 +149,7 @@
                             <!--                        <form id="form1">-->
                             <img id="blah" src="#" width="150" height="150">
                             <input id="imgInp" type="file" name="file" class="file">
-                            <button id="removebutton" type="button" class="btn btn-danger btn-sm">Remove</button>
+                            <!--                            <button id="removebutton" type="button" class="btn btn-danger btn-sm">Remove</button>-->
                             <!--</form>-->
                             <br>
 
@@ -203,9 +207,9 @@
                         <h4 class="modal-title">Type your username and password</h4>
                     </div>
                     <div class="modal-body">
-                        <input type="text" id="username" placeholder="Username" />
+                        <input type="text" id="usernameLogIn" placeholder="Username" />
                         <br>
-                        <input type="password" id="password" placeholder="Password"/>
+                        <input type="password" id="passwordLogIn" placeholder="Password"/>
                         <br>
                         <button id="forgotpass" type="button" class="btn btn-forgot" data-dismiss="modal">Forgot password?</button>
                     </div>
@@ -221,19 +225,27 @@
         <div class="modal fade" id="searchMod" tabindex="-1" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class ="modal-header">
+                    <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 class="modal-title">Search images based on their titles or on their tags by adding #</h4>
+                        <h4 class="modal-title">Search images based on their titles or user</h4>
                     </div>
                     <div class="modal-body">
 
                         <form class="navbar-form navbar-left" role="search">
                             <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search" id="searchbox">
+                                <input type="text" class="form-control" placeholder="Search titles" id="searchbox">
                             </div>
-                            <button type="submit" class="btn btn-default" id="submitsearch" >Submit</button>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search users" id="searchboxUser">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search description" id="searchboxDesc">
+                            </div>
+                            <!--<button type="submit" class="btn btn-default" id="submitsearch" >Submit</button>-->
+                            <!--<button class="btn btn-default" id="submitsearch" >Submit</button>-->
                         </form>
+                        <button class="btn btn-success" id="submitsearch">Search</button>
                     </div> <!--modal-body-->
                 </div> <!--modal-content-->
             </div> <!--modal-dialog-->
@@ -249,9 +261,9 @@
                         <h4 class="modal-title">Type your username and email to retrieve your password</h4>
                     </div>
                     <div class="modal-body">
-                        <input type="text" id="username" placeholder="Username" />
+                        <input type="text" id="usernameForgot" placeholder="Username" />
                         <br>
-                        <input type="password" id="email" placeholder="Email"/>
+                        <input type="password" id="emailForgot" placeholder="Email"/>
                     </div>
                     <div class="modal-footer">
                         <button id="forgotcheck" type="button" class="btn btn-primary">Send</button>

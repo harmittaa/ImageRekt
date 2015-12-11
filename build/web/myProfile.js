@@ -39,9 +39,9 @@ var user = {
 };
 //NEW UPLOAD BUTTON
     $("#upload").click(function () {
-        alert("clicky");
+//        alert("clicky");
         $("#uploadform").ajaxSubmit(user);
-        alert("Success!");
+//        alert("Success!");
         return false;
     });
 //TITLE LIMIT

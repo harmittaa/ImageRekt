@@ -11,6 +11,7 @@ $(document).ready(function () {
     var titlelimit = 30;
     var searchTitle = "";
     var searchUser = "";
+    var searchDesc = "";
 
 //    localStorage.setItem('loggedin', logged);
 
@@ -35,7 +36,7 @@ $(document).ready(function () {
 
             reader.onload = function (e) {
                 $('#blah').attr('src', e.target.result);
-            }
+            };
 
             reader.readAsDataURL(input.files[0]);
         }
@@ -61,12 +62,25 @@ $(document).ready(function () {
         success: showResponse
     };
 
+
 //NEW UPLOAD BUTTON
     $("#upload").click(function () {
-        alert("clicky");
-        $("#uploadform").ajaxSubmit(options);
-        alert("Success! ");
-        return false;
+        var titlelength = $('#titleinput').val();
+        var descriptionlength = $('#descriptioninput').val();
+//        var firstlength = titlelength.length;
+//        var secondlength = descriptionlength.length;
+        //TODO: KUVALLE CHECKI TYHJÄN VARALTA?!
+
+        if (titlelength.length < 1 || descriptionlength.length < 1) {
+//            alert("You have to give title and description to your upoload!");
+            event.preventDefault();
+        }
+        else {
+//            alert("clicky");
+            $("#uploadform").ajaxSubmit(options);
+//            alert("Success! ");
+            return false;
+        }
     });
 
     //TITLE LIMIT
@@ -99,68 +113,50 @@ $(document).ready(function () {
 
 //BUTTON TO MY PROFILE PAGE
     $('#myprofile').click(function () {
-//        var logged = localStorage.getItem('loggedin');
-//        if (logged == false) {
-//            alert("you have to log in first");
-//        }
-//        else {
-//            window.location = "myProfile.html";
-//        }
-
-        findUserImages();
+        if (localStorage.getItem('loggedin') === "true") {
+            findUserImages();
+        } else {
+            $('#logInMod').modal('show');
+        }
     });
 
 //SEARCH
     $('#search').click(function () {
         $('#searchMod').modal('show');
-//        $("#submitsearch").click(function () {
-//            event.stopPropagation();
-//            alert("Search button clicked " + searchTitle + " " + searchUser);
-//            searchTitle = "";
-//            searchUser = "";
-//            searchTitle = $("#searchbox").val();
-//            searchUser = $("#searchboxUser").val();
-//            alert("Search button values in place " + searchTitle + " " + searchUser);
-//            if (searchTitle === "" && searchUser === "") {
-//                alert("Put something in the box");
-//            }
-//            else if (searchTitle.length > 0 && searchUser.length > 0) {
-//                alert("Only input one search query");
-//            }
-//            else if (searchTitle.length > 0) {
-//                findImageByTitle(searchTitle);
-//            }
-//            else if (searchUser.length > 0) {
-//                findUserImages(searchUser);
-//            }
-//        });
     });
 
     $("#submitsearch").click(function () {
         event.stopPropagation();
-        alert("Search button clicked " + searchTitle + " " + searchUser);
+//        alert("Search button clicked " + searchTitle + " " + searchUser);
         searchTitle = "";
         searchUser = "";
+        searchDesc = "";
+        searchDesc = $("#searchboxDesc").val();
         searchTitle = $("#searchbox").val();
         searchUser = $("#searchboxUser").val();
-        alert("Search button values in place " + searchTitle + " " + searchUser);
-        if (searchTitle === "" && searchUser === "") {
+//        alert("Search button values in place " + searchTitle + " " + searchUser);
+        if (searchTitle === "" && searchUser === "" && searchDesc === "") {
             alert("Put something in the box");
         }
         else if (searchTitle.length > 0 && searchUser.length > 0) {
+            alert("Only input one search query");
+        }
+        else if (searchTitle.length > 0 && searchDesc.length > 0) {
+            alert("Only input one search query");
+        }
+        else if (searchUser.length > 0 && searchDesc.length > 0) {
             alert("Only input one search query");
         }
         else if (searchTitle.length > 0) {
             findImageByTitle(searchTitle);
         }
         else if (searchUser.length > 0) {
-            findUserImages(searchUser);
+            findUsernameImages(searchUser);
+        }
+        else if (searchDesc.length > 0) {
+            findImageByDesc(searchDesc);
         }
     });
-
-
-//SUBMIT SEARCH
-//TODO
 
 //LOGIN MODAL FROM HAMBURGER
     $('#login').click(function () {
@@ -181,12 +177,19 @@ $(document).ready(function () {
     $('#logincheck').click(function () {
         username = $("#usernameLogIn").val();
         password = $("#passwordLogIn").val();
-        alert("Username " + username + " password " + password);
+//        alert("Username " + username + " password " + password);
         checkUserLogin(username, password);
 
 //        logged = true;
     });
 
+    //LOG OUT
+    $("#logout").click(function () {
+//        alert("bye bye");
+        localStorage.setItem("loggedin", "false");
+        localStorage.setItem("user", "");
+        location.reload();
+    });
 
 //FORGOT PASSWORD
     $('#forgotpass').click(function () {
@@ -196,6 +199,11 @@ $(document).ready(function () {
 //RETRIEVE PASSWORD
 //TODO
 
+
+// MY FAVOURITES
+    $("#myfavourites").click(function () {
+        getFavourites();
+    });
 
 //SIGN UP MODAL FROM HAMBURGER
     $('#signup').click(function () {
@@ -233,34 +241,52 @@ $(document).ready(function () {
 
     if (localStorage.getItem("loggedin") === "true") {
         $("#signup").hide();
-        $("#loginButton").hide();
-
+        $("#login").hide();
+    } else {
+        $("#logout").hide();
+        $("#myfavourites").hide();
+        $("#myprofile").hide();
     }
+
+    if (localStorage.getItem("user") === "") {
+        localStorage.setItem("user", "802");
+    }
+
+    if (!localStorage.hasOwnProperty("user")) {
+        localStorage.setItem("user", "802");
+    }
+
+    if (!localStorage.hasOwnProperty("loggedin")) {
+        localStorage.setItem("loggedin", "false");
+    }
+
+
     /**************************NAVBAR FUNCTIONS END*************************/
 
 });
 
 
 $("#username").change(function () {
-    alert("Boo!");
+//    alert("Boo!");
     checkUsername("matti");
 });
 
 var placeholderID = "placeholder";
 
 function getJsonGallery() {
+    $("#picturediv").empty();
     $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/get_json_gallery", function (data) {
         $.each(data, function (index, value) {
 //            console.log("index " + index + " value " + value);
             $.each(value, function (index, value) {
                 //  console.log("Nr2 index" + index + " value " + value);
                 $.each(value, function (index, value) {
-//                    console.log("nr3 inxed " + index + " value " + value);
+                    console.log("nr3 inxed " + index + " value " + value);
                     if (index === ("path")) {
                         $('#picturediv').append('<img id="' + placeholderID + '" class="picture2 img-thumbnail" src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
                     }
                     else if (index === ("title")) {
-                        $('#picturediv').append('<p id=' + 1 + '>"' + value + '"</p>');
+                        $('#picturediv').append('<p id=' + 1321 + '>"' + value + '"</p>');
                     }
                     else if (index === ("iid")) {
                         $('#' + placeholderID).attr("id", value);
@@ -273,14 +299,14 @@ function getJsonGallery() {
         $(".picture").click(function () {
             chosenImage = $(this.id);
             console.log("user clicked " + chosenImage + " and");
-            alert("user clicked " + this.id);
+//            alert("user clicked " + this.id);
             localStorage.setItem('chosenImage', this.id);
         });
     });
 }
 
 function checkUserLogin(username, password) {
-    alert("In method User " + username + " pass " + password);
+//    alert("In method User " + username + " pass " + password);
     $.ajax({
         type: "GET",
         url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/checkUserLogin/" + username + "/" + password,
@@ -290,30 +316,32 @@ function checkUserLogin(username, password) {
                 alert("uname or pass wrong");
             }
             else {
-                alert("login succesful");
+//                alert("login succesful");
                 localStorage.setItem('loggedin', true);
                 localStorage.setItem('user', response);
                 $('#logInMod').modal('hide');
                 logged = true;
+                location.reload();
             }
         }
     });
 }
 
 function getImageDescription(image) {
-    alert("Getting image desc for IID " + image);
+//    alert("Getting image desc for IID " + image);
     $.ajax({
         type: "GET",
         url: "http://192.168.56.1:8080/ImageRekt/webresources/generic/getImageDescription/" + image,
         dataType: "text",
         success: function (response) {
-            alert("returning response " + response);
+//            alert("returning response " + response);
             parseDescription(response, image);
         }
     });
 }
 
 function showResponse(responseText) {
+//    alert("Show response!!!!!");
     localStorage.setItem("chosenImage", responseText);
     getImageDescription(responseText);
     window.location = "picturePage.html";
@@ -322,6 +350,7 @@ function showResponse(responseText) {
 function findUserImages() {
     uid = localStorage.getItem("user");
     $("#picturediv").empty();
+//    alert("searching user images!");
     $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findUserImages/" + uid, function (data) {
         $.each(data, function (index, value) {
             console.log("index " + index + " value " + value);
@@ -353,10 +382,10 @@ function checkUsername(username) {
         dataType: "text",
         success: function (response) {
             if (response === "OK") {
-                alert("Uname available");
+//                alert("Uname available");
             }
             else {
-                alert("uname taken!");
+//                alert("uname taken!");
             }
         }
     });
@@ -369,18 +398,18 @@ function createUser(username, password, email) {
         dataType: "text",
         success: function (response) {
             if (response === "CREATED") {
-                alert("USER CREATED");
+//                alert("USER CREATED");
                 $('#signUpMod').modal('hide');
             }
             else {
-                alert("UNAME_FOUND");
+//                alert("UNAME_FOUND");
             }
         }
     });
 }
 
 function findImageByTitle(title) {
-    alert("Searching with title");
+//    alert("Searching with title");
     console.log("Searcing title " + title);
     $("#picturediv").empty();
     $('#searchMod').modal('hide');
@@ -404,18 +433,50 @@ function findImageByTitle(title) {
         $(".picture").click(function () {
             chosenImage = $(this.id);
             console.log("user clicked " + chosenImage + " and");
-            alert("user clicked " + this.id);
+//            alert("user clicked " + this.id);
             localStorage.setItem('chosenImage', this.id);
         });
     });
 }
 
 function findUsernameImages(username) {
-    alert("Searching with username");
+//    alert("Searching with username");
     console.log("Searcing username " + username);
     $("#picturediv").empty();
     $('#searchMod').modal('hide');
     $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findUsernameImages/" + username, function (data) {
+        $.each(data, function (index, value) {
+            console.log("index " + index + " value " + value);
+            $.each(value, function (index, value) {
+                console.log("Nr2 index" + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("nr 3index " + index + " value " + value);
+                    if (index === ("path")) {
+                        $('#picturediv').append('<img id="' + placeholderID + '" class="picture2 img-thumbnail" src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
+                    }
+                    else if (index === ("title")) {
+                        $('#picturediv').append('<p id=' + 1 + '>"' + value + '"</p>');
+                    }
+                    else if (index === ("iid")) {
+                        $('#' + placeholderID).attr("id", value);
+                        $('#' + value).wrap('<a class="picture" id="' + value + '" href="picturePage.html"></a>');
+                    }
+                });
+            });
+        });
+        $(".picture").click(function () {
+            chosenImage = $(this.id);
+            console.log("user clicked " + chosenImage + " and");
+//            alert("user clicked " + this.id);
+            localStorage.setItem('chosenImage', this.id);
+        });
+    });
+}
+
+function getFavourites() {
+    $("#picturediv").empty();
+    uid = localStorage.getItem("user");
+    $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/getFavourites/" + uid, function (data) {
         $.each(data, function (index, value) {
             console.log("index " + index + " value " + value);
             $.each(value, function (index, value) {
@@ -435,7 +496,40 @@ function findUsernameImages(username) {
         $(".picture").click(function () {
             chosenImage = $(this.id);
             console.log("user clicked " + chosenImage + " and");
-            alert("user clicked " + this.id);
+//            alert("user clicked " + this.id);
+            localStorage.setItem('chosenImage', this.id);
+        });
+    });
+}
+
+function findImageByDesc(desc) {
+    $("#picturediv").empty();
+    $('#searchMod').modal('hide');
+//    alert("searching wiht desc");
+    $.getJSON("http://192.168.56.1:8080/ImageRekt/webresources/generic/findImageByDesc/" + desc, function (data) {
+        $.each(data, function (index, value) {
+            console.log("index " + index + " value " + value);
+            $.each(value, function (index, value) {
+                console.log("Nr2 index" + index + " value " + value);
+                $.each(value, function (index, value) {
+                    console.log("Nr3 index" + index + " value " + value);
+                    if (index === ("path")) {
+                        $('#picturediv').append('<img id="' + placeholderID + '" class="picture2 img-thumbnail" src="http://192.168.56.1/test/' + value + '" width="300" height="300" alt="image">');
+                    }
+                    else if (index === ("title")) {
+                        $('#picturediv').append('<p id=' + 1 + '>"' + value + '"</p>');
+                    }
+                    else if (index === ("iid")) {
+                        $('#' + placeholderID).attr("id", value);
+                        $('#' + value).wrap('<a class="picture" id="' + value + '" href="picturePage.html"></a>');
+                    }
+                });
+            });
+        });
+        $(".picture").click(function () {
+            chosenImage = $(this.id);
+            console.log("user clicked " + chosenImage + " and");
+//            alert("user clicked " + this.id);
             localStorage.setItem('chosenImage', this.id);
         });
     });

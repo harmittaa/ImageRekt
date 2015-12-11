@@ -59,6 +59,8 @@ public class GenericResource {
     private int searchTID;
     private int randomIID;
     private String imageDesc = "";
+    private String uploadTime = "";
+    private String parsedUploadTime = "";
     private Random randomno;
     private ArrayList<Image> userImageArray;
     private ArrayList<String> userArrayList;
@@ -305,9 +307,8 @@ public class GenericResource {
         this.userCollection = this.queryImage.getUserCollection();
         this.userCollection.remove(this.queryUser);
         this.queryImage.setUserCollection(this.userCollection);
-
         endTransaction();
-        return "Removed image " + this.queryImage.getPath() + " from user " + this.queryUser.getUname() + " favourites.";
+        return "done";
     }
 
     //find users favourite images
@@ -335,6 +336,7 @@ public class GenericResource {
         for (Image i : this.queryUser.getImageCollection()) {
             jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
             jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
             // build the JsonObject to finalize it
             //jsonImageObject = jsonObjectBuilder.build();
             jsonImageObject = jsonImageObjectBuilder.build();
@@ -465,6 +467,22 @@ public class GenericResource {
         jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();
         return jsonImageArray;
+    }
+
+    @GET
+    @Path("getRateAmount/{iid}")
+    @Produces("text/plain")
+    public String getRateAmount(@PathParam("iid") String iid) {
+        this.searchIID = Integer.parseInt(iid);
+        createTransaction();
+        this.searchIID = Integer.parseInt(iid);
+        this.rateList = em.createNamedQuery("Rate.findByIid").setParameter("iid", this.searchIID).getResultList();
+        if (this.rateList.size() < 1) {
+            endTransaction();
+            return "no rating";
+        }
+        endTransaction();
+        return "" + this.rateList.size();
     }
 
     //find user uploaded images
@@ -789,61 +807,116 @@ public class GenericResource {
     }
 
     @GET
-    @Path("getImageDescription/{image}")
-//    @Produces("application/json")
-    @Produces("text/plain")
-    public String getImageDescription(@PathParam("image") String iid) {
+    @Path("findImageByDesc/{desc}")
+    @Produces("application/json")
+    public JsonArray findImageByDesc(@PathParam("desc") String desc) {
         createTransaction();
-        this.searchIID = Integer.parseInt(iid);
-        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
-        this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
-
-        for (Tag t : this.tagList) {
-            this.tagContentList.add(t.getTcontent());
+        this.imageQuery = em.createNamedQuery("Image.findByDescriptionWild").setParameter("1", "%" + desc + "%").getResultList();
+//        this.imageQuery = em.createNamedQuery("Image.findByDescription").setParameter("description", desc).getResultList();
+        JsonObjectBuilder jsonImageObjectBuilder = Json.createObjectBuilder();
+        // create a JsonObject
+        jsonImageObject = jsonImageObjectBuilder.build();
+        // create a JsonArrayBuilder
+        JsonArrayBuilder jsonImageArrayBuilder = Json.createArrayBuilder();
+        // loop through all the images and add them into the JsonObject
+        for (Image i : this.imageQuery) {
+            jsonObjectBuilder = jsonImageObjectBuilder.add("path", i.getPath());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("title", i.getTitle());
+            jsonObjectBuilder = jsonImageObjectBuilder.add("iid", i.getIid());
+            // build the JsonObject to finalize it
+            jsonImageObject = jsonObjectBuilder.build();
+            // add the JsonObject to the ArrayBuilder (same as adding it to the array)
+            jsonImageArrayBuilder.add(jsonImageObject);
         }
-
-        this.imageDesc = this.queryImage.getDescription();
-
-        String[] wordArray = this.imageDesc.split(" ");
-
-        for (String word : wordArray) {
-            if (word.startsWith("#")) {
-                if (this.tagContentList.contains(word)) {
-                    for (Tag tt : this.tagList) {
-                        if (tt.getTcontent().equalsIgnoreCase(word)) {
-                            this.imageCollection = tt.getImageCollection();
-                            this.imageCollection.add(this.queryImage);
-
-                            this.tagCollection = this.queryImage.getTagCollection();
-                            this.tagCollection.add(tt);
-
-                            this.queryImage.setTagCollection(this.tagCollection);
-                            tt.setImageCollection(this.imageCollection);
-                        }
-                    }
-                } else {
-                    this.newTag = new Tag(word);
-                    em.persist(this.newTag);
-                    this.newTagList = em.createNamedQuery("Tag.findAll").getResultList();
-                    this.newTag = this.newTagList.get(this.newTagList.size() - 1);
-
-                    this.imageCollection = this.newTag.getImageCollection();
-                    this.imageCollection.add(this.queryImage);
-
-                    this.tagCollection = this.queryImage.getTagCollection();
-                    this.tagCollection.add(this.newTag);
-
-                    this.queryImage.setTagCollection(this.tagCollection);
-                    this.newTag.setImageCollection(this.imageCollection);
-                }
-            }
-        }
-
+        // create a JsonArray from the JsonArrayBuilder
+        jsonImageArray = Json.createArrayBuilder().add(jsonImageArrayBuilder).build();
         endTransaction();
-//        this.emptyJsonArray = Json.createArrayBuilder().add("WTF").build();
-        return "Woot";
+        return jsonImageArray;
     }
 
+    @GET
+    @Path("getFavouriteStatus/{image}/{user}")
+    @Produces("text/plain")
+    public String getFavouriteStatus(@PathParam("image") String iid,
+            @PathParam("user") String uid) {
+        this.searchIID = Integer.parseInt(iid);
+        this.searchUID = Integer.parseInt(uid);
+        createTransaction();
+        try {
+            this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+        } catch (Exception e) {
+            endTransaction();
+            return "No_img";
+        }
+        try {
+            this.queryUser = (User) em.createNamedQuery("User.findByUid").setParameter("uid", this.searchUID).getSingleResult();
+        } catch (Exception e) {
+            endTransaction();
+            return "no_user";
+        }
+        if (this.queryImage.getUserCollection().contains(this.queryUser)) {
+            endTransaction();
+            return "favourite";
+        } else {
+            endTransaction();
+            return "not_favourite";
+        }
+    }
+
+//    @GET
+//    @Path("getImageDescription/{image}")
+//    @Produces("text/plain")
+//    public String getImageDescription(@PathParam("image") String iid) {
+//        createTransaction();
+//        this.searchIID = Integer.parseInt(iid);
+//        this.queryImage = (Image) em.createNamedQuery("Image.findByIid").setParameter("iid", this.searchIID).getSingleResult();
+//        this.tagList = em.createNamedQuery("Tag.findAll").getResultList();
+//
+//        for (Tag t : this.tagList) {
+//            this.tagContentList.add(t.getTcontent());
+//        }
+//
+//        this.imageDesc = this.queryImage.getDescription();
+//
+//        String[] wordArray = this.imageDesc.split(" ");
+//
+//        for (String word : wordArray) {
+//            if (word.startsWith("#")) {
+//                if (this.tagContentList.contains(word)) {
+//                    for (Tag tt : this.tagList) {
+//                        if (tt.getTcontent().equalsIgnoreCase(word)) {
+//                            this.imageCollection = tt.getImageCollection();
+//                            this.imageCollection.add(this.queryImage);
+//
+//                            this.tagCollection = this.queryImage.getTagCollection();
+//                            this.tagCollection.add(tt);
+//
+//                            this.queryImage.setTagCollection(this.tagCollection);
+//                            tt.setImageCollection(this.imageCollection);
+//                        }
+//                    }
+//                } else {
+//                    this.newTag = new Tag(word);
+//                    em.persist(this.newTag);
+//                    this.newTagList = em.createNamedQuery("Tag.findAll").getResultList();
+//                    this.newTag = this.newTagList.get(this.newTagList.size() - 1);
+//
+//                    this.imageCollection = this.newTag.getImageCollection();
+//                    this.imageCollection.add(this.queryImage);
+//
+//                    this.tagCollection = this.queryImage.getTagCollection();
+//                    this.tagCollection.add(this.newTag);
+//
+//                    this.queryImage.setTagCollection(this.tagCollection);
+//                    this.newTag.setImageCollection(this.imageCollection);
+//                }
+//            }
+//        }
+//
+//        endTransaction();
+////        this.emptyJsonArray = Json.createArrayBuilder().add("WTF").build();
+//        return "Woot";
+//    }
     public void createTransaction() {
         emf = Persistence.createEntityManagerFactory("ImageRektPU");
         em = emf.createEntityManager();
