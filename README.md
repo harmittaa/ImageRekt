@@ -34,7 +34,7 @@ Title and description use wildcards, e.g. searching for a title relaxing yields 
 "How relaxing is this?" - Specific named queries are created for these, e.g.
 
 
-    @NamedQuery(name = "Image.findByDescriptionWild", query = "SELECT i FROM Image i WHERE i.description LIKE ?1 ORDER BY i.iid ASC"),
+  `  @NamedQuery(name = "Image.findByDescriptionWild", query = "SELECT i FROM Image i WHERE i.description LIKE ?1 ORDER BY i.iid ASC") `
 
 
 * User search is not case sensitive - shows the images the user has uploaded
