@@ -8,7 +8,7 @@ Mikael Gousetis
 
 ImageRekt is a web based image sharing service. It was developed for the smartphone users, with mobile first design.
 Users can upload, view, comment, rate, share, favourite and search for pictures.
-Registration is only required for users who wish to comment or rate.
+Registration is only required for users who wish to comment, rate or favourite images.
 
 For registered users the service offers the ability to view their uploaded and favourited images.
 
@@ -47,7 +47,10 @@ Facebook button - opens up the Facebook share
 Twitter button - opens up the Twitter share
 Random button - opens a image view of a random image
 The average rating and amount of ratings
+Rating, favouriting or commenting not available to guests - user is informed.
 
 Logged in specific:
 Favourite button - favourites or unfavourites the image, changes colour based on if the user has favourited the image
 User can rate an image - average and total rating are updated immediately
+Commenting - user can comment an image, comments are updated immediately
+Commenting - leaving an empty comment not possible
